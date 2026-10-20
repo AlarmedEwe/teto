@@ -34,10 +34,11 @@ Backlog de desenvolvimento organizado por marcos técnicos e guiado pelas especi
 ---
 
 ## 🎯 Marco 3: Módulo de Orçamento & Cálculo de Tetos
-- [ ] Implementar módulo `budget` (service + controller + rotas).
-- [ ] Implementar cálculos de teto por categoria a partir da renda informada.
-- [ ] Implementar cálculo de percentual utilizado e percentual do gasto total.
-- [ ] Criar testes unitários para as fórmulas matemáticas do teto.
+*Especificação de referência:* [specs/03-orcamento-e-tetos.md](file:///media/upd8-guilherme/TOSHIBA%20EXT/G/dev/node/teto/specs/03-orcamento-e-tetos.md)
+- [x] Implementar módulo `budget` (service + controller + rotas).
+- [x] Implementar cálculos de teto por categoria a partir da renda informada.
+- [x] Implementar cálculo de percentual utilizado e percentual do gasto total.
+- [x] Criar testes unitários para as fórmulas matemáticas do teto.
 
 ---
 

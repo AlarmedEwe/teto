@@ -4,6 +4,16 @@ Este documento registra os marcos e tarefas atômicas concluídas no projeto par
 
 ---
 
+### [2026-10-20] - Marco 3: Módulo de Orçamento & Cálculo de Tetos
+- [x] Criação da especificação técnica [specs/03-orcamento-e-tetos.md](file:///media/upd8-guilherme/TOSHIBA%20EXT/G/dev/node/teto/specs/03-orcamento-e-tetos.md).
+- [x] Implementação de funções puras de cálculo matemático de tetos, percentual de uso e percentual real (`budget.calculator.ts`).
+- [x] 100% de cobertura em testes unitários com `node:test` (`test/budget.calculator.test.ts`), validando arredondamento, divisão por zero e tetos negativos.
+- [x] Implementação do módulo `categories` (`GET /api/categories`, `PUT /api/categories`) com validação que impede metas cuja soma ultrapasse 100%.
+- [x] Implementação do módulo `budget` (`GET /api/budgets/:year/:month`, `PUT /api/budgets/:year/:month/income`) consolidando tetos por categoria em tempo real a partir da renda informada em centavos.
+- [x] Testes de integração via curl cobrindo cenários de sucesso e validação de erro (HTTP 400).
+
+---
+
 ### [2026-10-20] - Marco 2: Backend Skeleton, Banco de Dados & Prisma
 - [x] Criação da especificação técnica [specs/02-database-e-backend-core.md](file:///media/upd8-guilherme/TOSHIBA%20EXT/G/dev/node/teto/specs/02-database-e-backend-core.md).
 - [x] Configuração do `docker-compose.yml` e subida do container PostgreSQL 16 Alpine na porta 5432.

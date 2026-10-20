@@ -43,6 +43,13 @@ app.get('/health', async (_request, reply) => {
   }
 });
 
+import { categoriesRoutes } from './modules/categories/categories.routes.js';
+import { budgetRoutes } from './modules/budget/budget.routes.js';
+
+// Registrar rotas da API
+await app.register(categoriesRoutes, { prefix: '/api/categories' });
+await app.register(budgetRoutes, { prefix: '/api/budgets' });
+
 // Inicialização do servidor
 const PORT = Number(process.env.PORT) || 3333;
 const HOST = '0.0.0.0';
