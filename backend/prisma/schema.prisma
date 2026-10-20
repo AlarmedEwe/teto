@@ -1,0 +1,82 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum TransactionType {
+  EXPENSE
+  INCOME
+}
+
+enum TransactionSource {
+  MANUAL
+  CREDIT_CARD_CSV
+}
+
+model User {
+  id              String          @id @default(uuid())
+  name            String
+  email           String          @unique
+  createdAt       DateTime        @default(now()) @map("created_at")
+
+  categories      Category[]
+  monthlyBudgets  MonthlyBudget[]
+  transactions    Transaction[]
+
+  @@map("users")
+}
+
+model Category {
+  id              String          @id @default(uuid())
+  userId          String          @map("user_id")
+  name            String
+  defaultPct      Int             @map("default_pct")
+  colorHex        String          @map("color_hex")
+
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions    Transaction[]
+
+  @@map("categories")
+}
+
+model MonthlyBudget {
+  id              String          @id @default(uuid())
+  userId          String          @map("user_id")
+  month           Int
+  year            Int
+  totalIncome     Int             @default(0) @map("total_income")
+
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions    Transaction[]
+
+  @@unique([userId, month, year])
+  @@map("monthly_budgets")
+}
+
+model Transaction {
+  id                  String            @id @default(uuid())
+  userId              String            @map("user_id")
+  categoryId          String?           @map("category_id")
+  monthlyBudgetId     String            @map("monthly_budget_id")
+  description         String
+  amount              Int
+  date                DateTime          @db.Date
+  type                TransactionType   @default(EXPENSE)
+  source              TransactionSource @default(MANUAL)
+  installmentGroupId  String?           @map("installment_group_id")
+  currentInstallment  Int?              @map("current_installment")
+  totalInstallments   Int?              @map("total_installments")
+  createdAt           DateTime          @default(now()) @map("created_at")
+
+  user                User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category            Category?         @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  monthlyBudget       MonthlyBudget     @relation(fields: [monthlyBudgetId], references: [id], onDelete: Cascade)
+
+  @@index([userId, date])
+  @@index([monthlyBudgetId])
+  @@map("transactions")
+}

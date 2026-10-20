@@ -24,12 +24,12 @@ Backlog de desenvolvimento organizado por marcos técnicos e guiado pelas especi
 ---
 
 ## 🎯 Marco 2: Backend Skeleton, Banco de Dados & Prisma
-*Especificação de referência:* `specs/02-database-e-backend-core.md` (a definir)
+*Especificação de referência:* [specs/02-database-e-backend-core.md](file:///media/upd8-guilherme/TOSHIBA%20EXT/G/dev/node/teto/specs/02-database-e-backend-core.md)
 
-- [ ] Inicializar Fastify/Express no `backend/src/server.ts`.
-- [ ] Configurar Prisma ORM com schema PostgreSQL refletindo o modelo de dados do [GEMINI.md](file:///media/upd8-guilherme/TOSHIBA%20EXT/G/dev/node/teto/GEMINI.md).
-- [ ] Gerar migration inicial e seed com as categorias padrão AUVP (30/10/20/10/25/5).
-- [ ] Implementar middleware de tratamento de erros e resposta padronizada.
+- [x] Inicializar Fastify no `backend/src/server.ts`.
+- [x] Configurar Prisma ORM com schema PostgreSQL refletindo o modelo de dados do [GEMINI.md](file:///media/upd8-guilherme/TOSHIBA%20EXT/G/dev/node/teto/GEMINI.md).
+- [x] Gerar migration inicial e seed com as categorias padrão AUVP (30/10/20/10/25/5).
+- [x] Implementar middleware de tratamento de erros e resposta padronizada.
 
 ---
 

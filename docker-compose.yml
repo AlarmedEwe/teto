@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: teto-db
+    restart: always
+    environment:
+      POSTGRES_USER: teto
+      POSTGRES_PASSWORD: tetopassword
+      POSTGRES_DB: teto_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

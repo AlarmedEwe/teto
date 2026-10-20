@@ -1,18 +1,67 @@
-import { Transaction, TransactionType, TransactionSource } from '@teto/types';
+import 'dotenv/config';
+import Fastify from 'fastify';
+import cors from '@fastify/cors';
+import sensible from '@fastify/sensible';
+import { prisma } from './shared/database/prisma.js';
 
-console.log('Teto Backend initializing...');
+const app = Fastify({
+  logger: process.env.NODE_ENV === 'development' ? {
+    transport: {
+      target: 'pino-pretty',
+      options: {
+        colorize: true,
+      },
+    },
+  } : true,
+});
 
-const sampleTransaction: Transaction = {
-  id: 'uuid-1',
-  userId: 'user-1',
-  categoryId: 'cat-1',
-  monthlyBudgetId: 'budget-1',
-  description: 'Aluguel e Condomínio',
-  amount: 150000, // R$ 1.500,00 (em centavos)
-  date: '2026-10-20',
-  type: TransactionType.EXPENSE,
-  source: TransactionSource.MANUAL,
-  createdAt: new Date(),
+// Registrar plugins fundamentais
+await app.register(sensible);
+await app.register(cors, {
+  origin: true, // Em desenvolvimento, permite origens locais
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+});
+
+// Rota de Healthcheck com verificação de banco de dados
+app.get('/health', async (_request, reply) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    return {
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      database: 'connected',
+      version: '1.0.0',
+    };
+  } catch (err) {
+    app.log.error(err, 'Falha de conexão com o banco de dados');
+    return reply.status(503).send({
+      status: 'error',
+      timestamp: new Date().toISOString(),
+      database: 'disconnected',
+      error: 'Não foi possível comunicar com o PostgreSQL',
+    });
+  }
+});
+
+// Inicialização do servidor
+const PORT = Number(process.env.PORT) || 3333;
+const HOST = '0.0.0.0';
+
+try {
+  await app.listen({ port: PORT, host: HOST });
+  console.log(`🚀 Servidor Teto rodando em http://localhost:${PORT}`);
+} catch (err) {
+  app.log.error(err);
+  process.exit(1);
+}
+
+// Graceful shutdown
+const shutdown = async () => {
+  console.log('\n🛑 Encerrando servidor e conexões...');
+  await app.close();
+  await prisma.$disconnect();
+  process.exit(0);
 };
 
-console.log('Sample transaction model loaded successfully:', sampleTransaction.description);
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);
