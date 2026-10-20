@@ -1,0 +1,21 @@
+# Arquivos de histórico e anotações pessoais
+DONE.md
+HUMAN.md
+
+# Dependências e builds
+node_modules/
+dist/
+build/
+.turbo/
+
+# Variáveis de ambiente sensíveis
+.env
+.env.local
+.env.*.local
+
+# Testes e cobertura
+coverage/
+
+# Sistema Operacional
+.DS_Store
+Thumbs.db
