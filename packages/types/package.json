@@ -1,0 +1,24 @@
+{
+  "name": "@teto/types",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Contratos, entidades e DTOs compartilhados entre backend e frontend do Teto",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "dev": "tsc -w"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
+}

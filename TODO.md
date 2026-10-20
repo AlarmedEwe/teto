@@ -7,19 +7,19 @@ Backlog de desenvolvimento organizado por marcos técnicos e guiado pelas especi
 ## 🎯 Marco 1: Fundação do Monorepo & `@teto/types`
 *Especificação de referência:* [specs/01-setup-monorepo-e-types.md](file:///media/upd8-guilherme/TOSHIBA%20EXT/G/dev/node/teto/specs/01-setup-monorepo-e-types.md)
 
-- [ ] **Configuração da Raiz do Monorepo:**
-  - [ ] Criar `package.json` raiz com workspaces (`packages/*`, `backend`, `frontend`).
-  - [ ] Criar `tsconfig.base.json` com configurações estritas e paths compartilhados.
-- [ ] **Implementação do Pacote `@teto/types`:**
-  - [ ] Criar `packages/types/package.json` e `packages/types/tsconfig.json`.
-  - [ ] Implementar `enums.ts` (`TransactionType`, `TransactionSource`).
-  - [ ] Implementar `models.ts` (`User`, `Category`, `MonthlyBudget`, `Transaction`).
-  - [ ] Implementar `dtos.ts` (contratos de entrada e saída das rotas da API).
-  - [ ] Implementar `index.ts` (barrel export de tipos e enums).
-- [ ] **Vinculação com Backend e Frontend:**
-  - [ ] Configurar `backend/package.json` e `backend/tsconfig.json` para consumir `@teto/types`.
-  - [ ] Configurar `frontend/package.json` e `frontend/tsconfig.json` para consumir `@teto/types`.
-  - [ ] Executar build/typecheck comprovando importação sem erro nos dois lados.
+- [x] **Configuração da Raiz do Monorepo:**
+  - [x] Criar `package.json` raiz com workspaces (`packages/*`, `backend`, `frontend`).
+  - [x] Criar `tsconfig.base.json` com configurações estritas e paths compartilhados.
+- [x] **Implementação do Pacote `@teto/types`:**
+  - [x] Criar `packages/types/package.json` e `packages/types/tsconfig.json`.
+  - [x] Implementar `enums.ts` (`TransactionType`, `TransactionSource`).
+  - [x] Implementar `models.ts` (`User`, `Category`, `MonthlyBudget`, `Transaction`).
+  - [x] Implementar `dtos.ts` (contratos de entrada e saída das rotas da API).
+  - [x] Implementar `index.ts` (barrel export de tipos e enums).
+- [x] **Vinculação com Backend e Frontend:**
+  - [x] Configurar `backend/package.json` e `backend/tsconfig.json` para consumir `@teto/types`.
+  - [x] Configurar `frontend/package.json` e `frontend/tsconfig.json` para consumir `@teto/types`.
+  - [x] Executar build/typecheck comprovando importação sem erro nos dois lados.
 
 ---
 
