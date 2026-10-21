@@ -63,5 +63,6 @@ Backlog de desenvolvimento organizado por marcos técnicos e guiado pelas especi
 ---
 
 ## 🎯 Marco 6: Docker Compose & Infraestrutura Local
-- [ ] Configurar `docker-compose.yml` orquestrando PostgreSQL, Backend e Frontend.
-- [ ] Configurar volumes para hot-reload e persistência de dados do banco.
+*Especificação de referência:* [specs/06-docker-compose-orquestracao.md](file:///media/upd8-guilherme/TOSHIBA%20EXT/G/dev/node/teto/specs/06-docker-compose-orquestracao.md)
+- [x] Configurar `docker-compose.yml` orquestrando PostgreSQL, Backend e Frontend.
+- [x] Configurar volumes para hot-reload e persistência de dados do banco.

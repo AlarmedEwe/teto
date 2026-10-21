@@ -4,6 +4,15 @@ Este documento registra os marcos e tarefas atômicas concluídas no projeto par
 
 ---
 
+### [2026-10-21] - Marco 6: Docker Compose & Infraestrutura Local
+- [x] Criação da especificação técnica [specs/06-docker-compose-orquestracao.md](file:///media/upd8-guilherme/TOSHIBA%20EXT/G/dev/node/teto/specs/06-docker-compose-orquestracao.md).
+- [x] Implementação do `backend/Dockerfile` e `backend/entrypoint.sh` aguardando a prontidão do PostgreSQL, aplicando migrações do Prisma e executando seed das categorias AUVP automaticamente.
+- [x] Implementação do `frontend/Dockerfile` com suporte aos workspaces do monorepo e `@teto/types`, expondo o Vite em `0.0.0.0:5173`.
+- [x] Atualização do `docker-compose.yml` orquestrando os 3 contêineres (`db`, `backend`, `frontend`) com healthcheck e ordem de inicialização dependente (`service_healthy`).
+- [x] Validação sintática e de configuração completa via `docker compose config`.
+
+---
+
 ### [2026-10-21] - Marco 5: Frontend Mobile-First (Design System & Telas)
 - [x] Criação da especificação técnica [specs/05-frontend-mobile-first.md](file:///media/upd8-guilherme/TOSHIBA%20EXT/G/dev/node/teto/specs/05-frontend-mobile-first.md).
 - [x] Setup do Tailwind CSS com tema Dark Mode (`neutral-950`/`neutral-900`), acentos em âmbar (`amber-500`), utilitários glassmorphism e fonte Inter via Google Fonts.

@@ -11,6 +11,40 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U teto -d teto_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: teto-backend
+    restart: always
+    environment:
+      PORT: 3333
+      NODE_ENV: development
+      DATABASE_URL: postgresql://teto:tetopassword@db:5432/teto_db?schema=public
+    ports:
+      - "3333:3333"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: teto-frontend
+    restart: always
+    environment:
+      NODE_ENV: development
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:
