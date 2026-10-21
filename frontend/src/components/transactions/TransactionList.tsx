@@ -6,7 +6,7 @@ import { formatCurrency, formatDate } from '../../utils/formatters.js';
 interface TransactionListProps {
   transactions: TransactionResponseDTO[];
   categories: CategorySummaryItemDTO[];
-  onUpdateCategory: (transactionId: string, categoryId: string | null) => Promise<void>;
+  onUpdateCategory?: (transactionId: string, categoryId: string | null) => Promise<void>;
   onEditTransaction?: (transaction: TransactionResponseDTO) => void;
 }
 
@@ -40,7 +40,8 @@ export const TransactionList: React.FC<TransactionListProps> = ({
         return (
           <div
             key={tx.id}
-            className="p-3.5 rounded-2xl bg-neutral-900/80 border border-neutral-800 hover:border-neutral-700/80 transition flex items-center justify-between gap-3 shadow-md"
+            onClick={() => onEditTransaction && onEditTransaction(tx)}
+            className="p-3.5 rounded-2xl bg-neutral-900/80 border border-neutral-800 hover:border-neutral-700/80 transition flex items-center justify-between gap-3 shadow-md cursor-pointer group"
           >
             {/* Ícone e Descrição */}
             <div className="flex items-center gap-3 min-w-0">
@@ -60,7 +61,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <h5 className="text-sm font-semibold text-neutral-100 truncate">
+                  <h5 className="text-sm font-semibold text-neutral-100 group-hover:text-amber-400 transition truncate">
                     {tx.description}
                   </h5>
                   {hasInstallment && (
@@ -72,33 +73,22 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                 </div>
 
                 <div className="flex items-center gap-2.5 mt-0.5 text-[11px] text-neutral-400">
-                  <span className="flex items-center gap-1">
+                  <span className="flex items-center gap-1 shrink-0">
                     <Calendar className="w-3 h-3 text-neutral-500" />
                     {formatDate(tx.date)}
                   </span>
 
-                  {/* Seletor rápido de Categoria */}
+                  {/* Categoria estática */}
                   {isExpense && (
-                    <div className="flex items-center gap-1">
+                    <span className="flex items-center gap-1.5 truncate">
                       <span
                         className="w-2 h-2 rounded-full shrink-0"
                         style={{ backgroundColor: cat ? cat.colorHex : '#737373' }}
                       />
-                      <select
-                        value={tx.categoryId || ''}
-                        onChange={(e) => onUpdateCategory(tx.id, e.target.value || null)}
-                        className="bg-transparent text-[11px] font-medium text-neutral-300 hover:text-white cursor-pointer focus:outline-none truncate max-w-36"
-                      >
-                        <option value="" className="bg-neutral-900 text-neutral-400">
-                          Pendente de Categoria
-                        </option>
-                        {categories.map((c) => (
-                          <option key={c.categoryId} value={c.categoryId} className="bg-neutral-900 text-white">
-                            {c.name} ({c.targetPct}%)
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                      <span className="truncate text-neutral-300">
+                        {cat ? `${cat.name} (${cat.targetPct}%)` : 'Pendente de Categoria'}
+                      </span>
+                    </span>
                   )}
                 </div>
               </div>
@@ -119,7 +109,10 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 
               {onEditTransaction && (
                 <button
-                  onClick={() => onEditTransaction(tx)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEditTransaction(tx);
+                  }}
                   className="p-1.5 rounded-lg text-neutral-400 hover:text-amber-400 hover:bg-neutral-800 transition"
                   title="Editar lançamento"
                 >
