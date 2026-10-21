@@ -33,9 +33,9 @@ export const CategoryGoalsModal: React.FC<CategoryGoalsModalProps> = ({
     }));
   };
 
-  const handleResetAUVP = () => {
-    // Reset para o padrão AUVP oficial: 30 / 10 / 20 / 10 / 25 / 5
-    const auvpMap: Record<string, number> = {
+  const handleResetDefaultGoals = () => {
+    // Reset para as metas padrão: 30 / 10 / 20 / 10 / 25 / 5
+    const defaultMap: Record<string, number> = {
       'custos fixos': 30,
       'conforto': 10,
       'metas': 20,
@@ -46,10 +46,10 @@ export const CategoryGoalsModal: React.FC<CategoryGoalsModalProps> = ({
 
     const newGoals: Record<string, number> = {};
     for (const cat of categories) {
-      const matchKey = Object.keys(auvpMap).find((k) =>
+      const matchKey = Object.keys(defaultMap).find((k) =>
         cat.name.toLowerCase().includes(k)
       );
-      newGoals[cat.categoryId] = matchKey ? auvpMap[matchKey] : 0;
+      newGoals[cat.categoryId] = matchKey ? defaultMap[matchKey] : 0;
     }
     setGoals(newGoals);
   };
@@ -93,7 +93,7 @@ export const CategoryGoalsModal: React.FC<CategoryGoalsModalProps> = ({
               <Sliders className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white">Metas & Tetos (AUVP)</h3>
+              <h3 className="text-base font-bold text-white">Metas & Tetos</h3>
               <p className="text-xs text-neutral-400">Distribuição percentual da renda</p>
             </div>
           </div>
@@ -156,10 +156,10 @@ export const CategoryGoalsModal: React.FC<CategoryGoalsModalProps> = ({
           <div className="pt-2 flex items-center justify-between">
             <button
               type="button"
-              onClick={handleResetAUVP}
+              onClick={handleResetDefaultGoals}
               className="text-xs text-amber-400 hover:text-amber-300 underline font-medium"
             >
-              Restaurar Padrão AUVP
+              Restaurar Metas Padrão (30/10/20/10/25/5)
             </button>
           </div>
 

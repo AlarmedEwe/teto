@@ -8,6 +8,8 @@ interface TransactionModalProps {
   categories: CategorySummaryItemDTO[];
   onSave: (data: CreateTransactionDTO) => Promise<void>;
   defaultDate?: string;
+  initialType?: TransactionType;
+  initialDescription?: string;
 }
 
 export const TransactionModal: React.FC<TransactionModalProps> = ({
@@ -16,23 +18,39 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
   categories,
   onSave,
   defaultDate,
+  initialType = TransactionType.EXPENSE,
+  initialDescription = '',
 }) => {
-  const [description, setDescription] = useState('');
+  const [description, setDescription] = useState(initialDescription);
   const [amountStr, setAmountStr] = useState('');
   const [date, setDate] = useState(defaultDate || new Date().toISOString().split('T')[0]);
   const [categoryId, setCategoryId] = useState<string>(categories[0]?.categoryId || '');
-  const [type, setType] = useState<TransactionType>(TransactionType.EXPENSE);
+  const [type, setType] = useState<TransactionType>(initialType);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Sincroniza estado inicial sempre que o modal abre
+  React.useEffect(() => {
+    if (isOpen) {
+      setType(initialType);
+      setDescription(initialDescription || (initialType === TransactionType.INCOME ? 'Salário' : ''));
+      setAmountStr('');
+      setDate(defaultDate || new Date().toISOString().split('T')[0]);
+      setCategoryId(categories[0]?.categoryId || '');
+      setError(null);
+    }
+  }, [isOpen, initialType, initialDescription, defaultDate, categories]);
+
   if (!isOpen) return null;
+
+  const isIncome = type === TransactionType.INCOME;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
     if (!description.trim()) {
-      setError('Informe o descritivo da despesa');
+      setError(isIncome ? 'Informe a descrição da renda' : 'Informe o descritivo da despesa');
       return;
     }
 
@@ -49,12 +67,12 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
         description: description.trim(),
         amount,
         date,
-        categoryId: categoryId || null,
+        categoryId: isIncome ? null : (categoryId || null),
         type,
       });
       onClose();
     } catch (err: any) {
-      setError(err.message || 'Erro ao criar transação');
+      setError(err.message || 'Erro ao registrar transação');
     } finally {
       setLoading(false);
     }
@@ -71,12 +89,20 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
         </button>
 
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center shadow-inner">
+          <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shadow-inner ${
+            isIncome
+              ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
+              : 'bg-amber-500/10 border border-amber-500/20 text-amber-400'
+          }`}>
             <Plus className="w-5 h-5 stroke-[2.5]" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-white">Novo Lançamento</h3>
-            <p className="text-xs text-neutral-400">Despesa ou Entrada manual</p>
+            <h3 className="text-base font-bold text-white">
+              {isIncome ? 'Lançar Renda / Receita' : 'Novo Gasto'}
+            </h3>
+            <p className="text-xs text-neutral-400">
+              {isIncome ? 'Salário, prestação de serviços ou entradas' : 'Despesa manual no teto orçamentário'}
+            </p>
           </div>
         </div>
 
@@ -87,13 +113,16 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
         )}
 
         <form onSubmit={handleSubmit} className="space-y-3.5">
-          {/* Seletor Tipo (Despesa / Receita) */}
+          {/* Seletor Tipo (Despesa / Renda) */}
           <div className="grid grid-cols-2 gap-2 p-1 bg-neutral-900 border border-neutral-800 rounded-xl">
             <button
               type="button"
-              onClick={() => setType(TransactionType.EXPENSE)}
+              onClick={() => {
+                setType(TransactionType.EXPENSE);
+                if (description === 'Salário') setDescription('');
+              }}
               className={`py-1.5 rounded-lg text-xs font-bold transition ${
-                type === TransactionType.EXPENSE
+                !isIncome
                   ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
                   : 'text-neutral-400 hover:text-white'
               }`}
@@ -102,27 +131,30 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
             </button>
             <button
               type="button"
-              onClick={() => setType(TransactionType.INCOME)}
+              onClick={() => {
+                setType(TransactionType.INCOME);
+                if (!description) setDescription('Salário');
+              }}
               className={`py-1.5 rounded-lg text-xs font-bold transition ${
-                type === TransactionType.INCOME
+                isIncome
                   ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
                   : 'text-neutral-400 hover:text-white'
               }`}
             >
-              Receita Extra
+              Renda / Receita
             </button>
           </div>
 
           {/* Descrição */}
           <div>
             <label className="text-xs font-semibold text-neutral-300 block mb-1">
-              Descrição
+              {isIncome ? 'Origem / Descrição da Renda' : 'Descrição da Despesa'}
             </label>
             <input
               type="text"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Ex: Aluguel, Supermercado..."
+              placeholder={isIncome ? 'Ex: Salário, Pró-labore, Freelance...' : 'Ex: Aluguel, Supermercado...'}
               className="w-full bg-neutral-900 border border-neutral-700/80 rounded-xl py-2 px-3 text-white text-sm focus:outline-none focus:border-amber-500 transition"
               autoFocus
             />
@@ -195,9 +227,13 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 text-sm font-bold shadow-lg shadow-amber-500/20 transition disabled:opacity-50"
+              className={`flex-1 py-2.5 rounded-xl text-neutral-950 text-sm font-bold shadow-lg transition disabled:opacity-50 ${
+                isIncome
+                  ? 'bg-emerald-400 hover:bg-emerald-300 shadow-emerald-500/20'
+                  : 'bg-amber-500 hover:bg-amber-400 shadow-amber-500/20'
+              }`}
             >
-              {loading ? 'Adicionando...' : 'Adicionar'}
+              {loading ? 'Salvando...' : isIncome ? 'Lançar Renda' : 'Adicionar Despesa'}
             </button>
           </div>
         </form>

@@ -1,6 +1,6 @@
 # Spec 02: Backend Core, Banco de Dados & Prisma ORM
 
-Especificação técnica para inicialização do servidor Fastify, modelagem relacional via Prisma ORM, container do PostgreSQL e seed inicial das categorias AUVP.
+Especificação técnica para inicialização do servidor Fastify, modelagem relacional via Prisma ORM, container do PostgreSQL e seed inicial das categorias padrão de tetos.
 
 ---
 
@@ -10,7 +10,7 @@ Construir a fundação do backend da aplicação **Teto**, provendo:
 - Conexão e pooling de banco com **Prisma ORM** e **PostgreSQL 16**.
 - Modelagem relacional fiel à Seção 3 do [GEMINI.md](file:///media/upd8-guilherme/TOSHIBA%20EXT/G/dev/node/teto/GEMINI.md).
 - Precisão monetária estrita em centavos (`Int` no Prisma / banco).
-- Seed automático com as 6 categorias da metodologia AUVP (30/10/20/10/25/5).
+- Seed automático com as 6 categorias padrão de tetos (30/10/20/10/25/5).
 - Docker Compose com serviço `db` para desenvolvimento local.
 
 ---
@@ -109,7 +109,7 @@ model Transaction {
 
 ---
 
-## 3. Seed de Categorias AUVP
+## 3. Seed de Categorias Padrão de Tetos
 O seed deve garantir a existência de um usuário padrão (`default@teto.local`) e as 6 categorias com suas cores e percentuais:
 1. **Custos Fixos**: `30%`, `#3b82f6` (Azul)
 2. **Conforto**: `10%`, `#06b6d4` (Ciano)
@@ -132,5 +132,5 @@ O seed deve garantir a existência de um usuário padrão (`default@teto.local`)
 1. [ ] `docker-compose.yml` inicializado com container Postgres funcional na porta 5432.
 2. [ ] Schema Prisma criado e validado (`npx prisma validate`).
 3. [ ] Migration executada criando as tabelas com integridade referencial e índices.
-4. [ ] Script `seed.ts` executando com sucesso e cadastrando categorias AUVP.
+4. [ ] Script `seed.ts` executando com sucesso e cadastrando categorias padrão.
 5. [ ] Servidor Fastify respondendo com sucesso em `http://localhost:3333/health`.

@@ -1,6 +1,6 @@
 # Spec 05: Frontend Mobile-First (Design System, Telas e Componentes)
 
-Especificação técnica para o desenvolvimento da interface web do **Teto**, com foco em design mobile-first, tema dark com acentos em âmbar, gráficos AUVP e controle interativo de orçamento.
+Especificação técnica para o desenvolvimento da interface web do **Teto**, com foco em design mobile-first, tema dark com acentos em âmbar, gráficos interativos e controle de tetos orçamentários.
 
 ---
 
@@ -41,11 +41,11 @@ frontend/src/
 │   │   ├── BottomNav.tsx           # Navegação mobile fixa inferior
 │   │   └── Sidebar.tsx             # Navegação desktop lateral
 │   ├── charts/
-│   │   └── DonutBudgetChart.tsx    # Gráfico Donut AUVP com Recharts
+│   │   └── DonutBudgetChart.tsx    # Gráfico Donut de distribuição com Recharts
 │   ├── budget/
 │   │   ├── IncomeModal.tsx         # Modal para definir/alterar renda líquida
 │   │   ├── CategoryCard.tsx        # Card individual com barra de teto e status
-│   │   └── CategoryGoalsModal.tsx  # Modal para ajuste das porcentagens AUVP
+│   │   └── CategoryGoalsModal.tsx  # Modal para ajuste das metas percentuais
 │   ├── transactions/
 │   │   ├── TransactionModal.tsx    # Modal de lançamento manual
 │   │   └── TransactionList.tsx     # Lista de transações do mês com badge de parcelas

@@ -15,7 +15,7 @@ O objetivo dessa referência não é engessar ou burocratizar, mas estabelecer u
 - **Remanejamento Consciente:** Se um teto for flexibilizado ou excedido em uma categoria, isso requer ajuste explícito e consciente em outra, preservando a poupança/investimentos.
 
 ### 1.2 Visão Geral da Solução
-Aplicação web **mobile-first** de orçamento doméstico inspirada na metodologia de divisão percentual de renda (estilo AUVP) e tetos orçamentários categorizados. O sistema permite o controle mensal de receitas e despesas, cálculo automático de tetos orçamentários por categoria, acompanhamento visual por gráficos e importação inteligente de faturas de cartão de crédito via CSV com suporte a parcelamentos futuros.
+Aplicação web **mobile-first** de orçamento doméstico inspirada na metodologia de divisão percentual equilibrada de renda e tetos orçamentários categorizados. O sistema permite o controle mensal de receitas e despesas, cálculo automático de tetos orçamentários por categoria, acompanhamento visual por gráficos e importação inteligente de faturas de cartão de crédito via CSV com suporte a parcelamentos futuros.
 
 ### 1.3 Stack Tecnológica & Tipagem Unificada
 Aproveitando o ecossistema full-stack em **TypeScript**, o projeto adota arquitetura de monorepo/workspaces para unificar completamente a camada de tipos entre Frontend e Backend, garantindo *single source of truth* e contrato rigoroso de API.
@@ -165,7 +165,7 @@ teto/
 - **Tema:** Dark mode com paleta escura (`bg-neutral-950`, cards `bg-neutral-900`, bordas `border-neutral-800`) com acentos em âmbar/dourado (`amber-500`) e indicadores semânticos (verde para dentro do teto, vermelho/laranja para estouro).
 - **Responsividade:**
   - **Mobile (< 768px):** Menu inferior fixo (Bottom Navigation Bar), cards verticais empilhados, resumo colapsável e botão de ação rápida flutuante (`+` para novo gasto ou upload de CSV).
-  - **Desktop (>= 1024px):** Sidebar retrátil à esquerda e grid de 3 colunas similar ao layout AUVP (Donut Chart | Resumo Orçamentário | Metas e Percentuais).
+  - **Desktop (>= 1024px):** Sidebar retrátil à esquerda e grid de 3 colunas (Donut Chart | Resumo Orçamentário | Metas e Percentuais).
 
 ---
 

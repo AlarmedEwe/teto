@@ -91,7 +91,7 @@ backend/src/
 
 ## 4. Critérios de Aceite
 1. [ ] Funções puras de cálculo matemático de tetos implementadas com 100% de cobertura de testes unitários (`budget.calculator.test.ts`).
-2. [ ] `GET /api/categories` listando as 6 categorias padrão AUVP.
+2. [ ] `GET /api/categories` listando as 6 categorias padrão de tetos.
 3. [ ] `PUT /api/categories` atualizando percentuais com validação.
 4. [ ] `PUT /api/budgets/:year/:month/income` criando ou atualizando a renda mensal base em centavos.
 5. [ ] `GET /api/budgets/:year/:month` retornando consolidação precisa de tetos, valores gastos e percentuais de uso.

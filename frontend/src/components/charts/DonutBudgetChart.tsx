@@ -27,7 +27,7 @@ export const DonutBudgetChart: React.FC<DonutBudgetChartProps> = ({ categories, 
     <div className="flex flex-col items-center justify-center w-full bg-neutral-900/60 border border-neutral-800 rounded-2xl p-4 sm:p-6 shadow-xl relative overflow-hidden">
       <div className="w-full flex items-center justify-between mb-2">
         <h3 className="text-sm font-semibold text-neutral-300">Distribuição Real do Mês</h3>
-        <span className="text-xs text-neutral-500 font-mono">AUVP Metas</span>
+        <span className="text-xs text-neutral-500 font-mono">Metas & Tetos</span>
       </div>
 
       <div className="relative w-full h-56 sm:h-64 flex items-center justify-center">

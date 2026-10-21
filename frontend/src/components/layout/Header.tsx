@@ -10,7 +10,7 @@ interface HeaderProps {
   balance: number;
   onPrevMonth: () => void;
   onNextMonth: () => void;
-  onOpenIncomeModal: () => void;
+  onOpenIncomeTransaction: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -21,7 +21,7 @@ export const Header: React.FC<HeaderProps> = ({
   balance,
   onPrevMonth,
   onNextMonth,
-  onOpenIncomeModal,
+  onOpenIncomeTransaction,
 }) => {
   const isDeficit = balance < 0;
 
@@ -37,9 +37,6 @@ export const Header: React.FC<HeaderProps> = ({
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="text-xl font-black tracking-tight text-white">Teto</span>
-                <span className="text-[10px] uppercase tracking-wider font-semibold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                  AUVP
-                </span>
               </div>
               <p className="text-[11px] text-neutral-400 hidden sm:block">Arcabouço Fiscal Doméstico</p>
             </div>
@@ -91,13 +88,14 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Resumo Rápido */}
         <div className="grid grid-cols-3 gap-2 sm:flex sm:items-center sm:gap-3">
           <button
-            onClick={onOpenIncomeModal}
-            className="flex flex-col p-2 sm:px-3 sm:py-1.5 rounded-xl bg-neutral-900/80 border border-neutral-800 hover:border-amber-500/50 hover:bg-neutral-800/80 transition text-left group"
+            onClick={onOpenIncomeTransaction}
+            className="flex flex-col p-2 sm:px-3 sm:py-1.5 rounded-xl bg-neutral-900/80 border border-neutral-800 hover:border-emerald-500/50 hover:bg-neutral-800/80 transition text-left group"
+            title="Clique para lançar ou adicionar renda / salário"
           >
-            <span className="text-[10px] text-neutral-400 font-medium group-hover:text-amber-400 flex items-center gap-1">
-              Renda ✎
+            <span className="text-[10px] text-neutral-400 font-medium group-hover:text-emerald-400 flex items-center gap-1">
+              Renda ＋
             </span>
-            <span className="text-xs sm:text-sm font-semibold text-neutral-100 truncate">
+            <span className="text-xs sm:text-sm font-semibold text-emerald-400 truncate">
               {formatCurrency(totalIncome)}
             </span>
           </button>

@@ -28,7 +28,7 @@ Backlog de desenvolvimento organizado por marcos técnicos e guiado pelas especi
 
 - [x] Inicializar Fastify no `backend/src/server.ts`.
 - [x] Configurar Prisma ORM com schema PostgreSQL refletindo o modelo de dados do [GEMINI.md](file:///media/upd8-guilherme/TOSHIBA%20EXT/G/dev/node/teto/GEMINI.md).
-- [x] Gerar migration inicial e seed com as categorias padrão AUVP (30/10/20/10/25/5).
+- [x] Gerar migration inicial e seed com as categorias padrão de tetos (30/10/20/10/25/5).
 - [x] Implementar middleware de tratamento de erros e resposta padronizada.
 
 ---
@@ -56,7 +56,7 @@ Backlog de desenvolvimento organizado por marcos técnicos e guiado pelas especi
 *Especificação de referência:* [specs/05-frontend-mobile-first.md](file:///media/upd8-guilherme/TOSHIBA%20EXT/G/dev/node/teto/specs/05-frontend-mobile-first.md)
 - [x] Setup do Vite + React + Tailwind CSS com tema Dark Mode / Âmbar.
 - [x] Componentes de navegação: Bottom Navigation Bar (Mobile) e Sidebar retrátil (Desktop).
-- [x] Componente Donut Chart com Recharts para visualização AUVP.
+- [x] Componente Donut Chart com Recharts para visualização da distribuição de gastos.
 - [x] Cards de categorias com barras de progresso semânticas (verde/âmbar/vermelho).
 - [x] Drawer / Modal de lançamento rápido (`+`) e upload de CSV.
 

@@ -6,7 +6,7 @@ interface SidebarProps {
   activeTab: NavTab;
   onTabChange: (tab: NavTab) => void;
   onOpenTransactionModal: () => void;
-  onOpenIncomeModal: () => void;
+  onOpenIncomeTransaction: () => void;
   onOpenCsvModal: () => void;
 }
 
@@ -14,7 +14,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   activeTab,
   onTabChange,
   onOpenTransactionModal,
-  onOpenIncomeModal,
+  onOpenIncomeTransaction,
   onOpenCsvModal,
 }) => {
   return (
@@ -58,7 +58,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             }`}
           >
             <Sliders className="w-4 h-4" />
-            <span>Metas AUVP</span>
+            <span>Metas & Tetos</span>
           </button>
         </div>
 
@@ -84,11 +84,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </button>
 
           <button
-            onClick={onOpenIncomeModal}
-            className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-neutral-700 text-neutral-200 text-sm font-semibold transition hover:bg-neutral-800/80"
+            onClick={onOpenIncomeTransaction}
+            className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-emerald-500/40 text-neutral-200 text-sm font-semibold transition hover:bg-neutral-800/80"
           >
             <DollarSign className="w-4 h-4 text-emerald-400" />
-            <span>Definir Renda</span>
+            <span>+ Nova Renda</span>
           </button>
         </div>
       </div>

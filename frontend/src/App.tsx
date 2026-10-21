@@ -5,12 +5,12 @@ import { BottomNav, NavTab } from './components/layout/BottomNav.js';
 import { Sidebar } from './components/layout/Sidebar.js';
 import { DonutBudgetChart } from './components/charts/DonutBudgetChart.js';
 import { CategoryCard } from './components/budget/CategoryCard.js';
-import { IncomeModal } from './components/budget/IncomeModal.js';
 import { CategoryGoalsModal } from './components/budget/CategoryGoalsModal.js';
 import { TransactionModal } from './components/transactions/TransactionModal.js';
 import { TransactionList } from './components/transactions/TransactionList.js';
 import { CsvUploadModal } from './components/csv-uploader/CsvUploadModal.js';
 import { Plus, Sliders, Upload, RefreshCw, AlertCircle } from 'lucide-react';
+import { TransactionType } from '@teto/types';
 import { formatCurrency } from './utils/formatters.js';
 
 export default function App() {
@@ -24,7 +24,6 @@ export default function App() {
     prevMonth,
     nextMonth,
     refresh,
-    updateIncome,
     updateCategories,
     createTransaction,
     importCsv,
@@ -32,15 +31,28 @@ export default function App() {
   } = useBudget();
 
   const [activeTab, setActiveTab] = useState<NavTab>('dashboard');
-  const [incomeModalOpen, setIncomeModalOpen] = useState(false);
   const [goalsModalOpen, setGoalsModalOpen] = useState(false);
   const [transactionModalOpen, setTransactionModalOpen] = useState(false);
+  const [transactionModalType, setTransactionModalType] = useState<TransactionType>(TransactionType.EXPENSE);
+  const [transactionModalDescription, setTransactionModalDescription] = useState<string>('');
   const [csvModalOpen, setCsvModalOpen] = useState(false);
 
   const categories = budget?.categories || [];
   const totalIncome = budget?.totalIncome || 0;
   const totalSpent = budget?.totalSpent || 0;
   const balance = budget?.balance || 0;
+
+  const handleOpenExpenseModal = () => {
+    setTransactionModalType(TransactionType.EXPENSE);
+    setTransactionModalDescription('');
+    setTransactionModalOpen(true);
+  };
+
+  const handleOpenIncomeModal = () => {
+    setTransactionModalType(TransactionType.INCOME);
+    setTransactionModalDescription('Salário');
+    setTransactionModalOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col pb-20 sm:pb-0">
@@ -53,7 +65,7 @@ export default function App() {
         balance={balance}
         onPrevMonth={prevMonth}
         onNextMonth={nextMonth}
-        onOpenIncomeModal={() => setIncomeModalOpen(true)}
+        onOpenIncomeTransaction={handleOpenIncomeModal}
       />
 
       {/* Conteúdo Principal com Sidebar */}
@@ -62,8 +74,8 @@ export default function App() {
         <Sidebar
           activeTab={activeTab}
           onTabChange={setActiveTab}
-          onOpenTransactionModal={() => setTransactionModalOpen(true)}
-          onOpenIncomeModal={() => setIncomeModalOpen(true)}
+          onOpenTransactionModal={handleOpenExpenseModal}
+          onOpenIncomeTransaction={handleOpenIncomeModal}
           onOpenCsvModal={() => setCsvModalOpen(true)}
         />
 
@@ -96,25 +108,25 @@ export default function App() {
                 <div className="space-y-6">
                   {/* Banner de Renda Zerada (Onboarding inicial) */}
                   {totalIncome === 0 && (
-                    <div className="p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg">
+                    <div className="p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-emerald-500/5 to-transparent border border-emerald-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg">
                       <div>
-                        <h4 className="text-sm font-bold text-amber-400">
-                          Defina sua renda deste mês para calcular os tetos
+                        <h4 className="text-sm font-bold text-emerald-400">
+                          Nenhuma renda lançada este mês
                         </h4>
                         <p className="text-xs text-neutral-400 mt-0.5">
-                          A metodologia AUVP distribui automaticamente seu orçamento entre as categorias.
+                          Lance seu salário ou receitas como transações de renda para calcular os tetos por categoria.
                         </p>
                       </div>
                       <button
-                        onClick={() => setIncomeModalOpen(true)}
-                        className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold text-xs shadow-md shadow-amber-500/20 transition shrink-0"
+                        onClick={handleOpenIncomeModal}
+                        className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-neutral-950 font-bold text-xs shadow-md shadow-emerald-500/20 transition shrink-0"
                       >
-                        Informar Renda Líquida
+                        + Lançar Salário / Renda
                       </button>
                     </div>
                   )}
 
-                  {/* Grid AUVP Principal */}
+                  {/* Grid Principal */}
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                     {/* Donut Chart (Coluna Esquerda no Desktop) */}
                     <div className="lg:col-span-5 space-y-4">
@@ -123,7 +135,7 @@ export default function App() {
                       {/* Mini Ações Desktop */}
                       <div className="hidden sm:grid grid-cols-2 gap-3">
                         <button
-                          onClick={() => setTransactionModalOpen(true)}
+                          onClick={handleOpenExpenseModal}
                           className="p-3 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-amber-500/50 hover:bg-neutral-800/80 transition flex items-center justify-center gap-2 text-xs font-semibold text-neutral-200"
                         >
                           <Plus className="w-4 h-4 text-amber-500" />
@@ -203,7 +215,14 @@ export default function App() {
                         <span>CSV</span>
                       </button>
                       <button
-                        onClick={() => setTransactionModalOpen(true)}
+                        onClick={handleOpenIncomeModal}
+                        className="px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold text-xs hover:bg-emerald-500/20 transition flex items-center gap-1.5"
+                      >
+                        <Plus className="w-3.5 h-3.5 stroke-[3]" />
+                        <span>Nova Renda</span>
+                      </button>
+                      <button
+                        onClick={handleOpenExpenseModal}
                         className="px-3 py-1.5 rounded-xl bg-amber-500 text-neutral-950 font-bold text-xs hover:bg-amber-400 transition flex items-center gap-1.5"
                       >
                         <Plus className="w-3.5 h-3.5 stroke-[3]" />
@@ -220,12 +239,12 @@ export default function App() {
                 </div>
               )}
 
-              {/* TAB 3: METAS E CATEGORIAS AUVP */}
+              {/* TAB 3: METAS E CATEGORIAS */}
               {activeTab === 'goals' && (
                 <div className="space-y-6 max-w-2xl">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="text-lg font-bold text-white">Minhas Metas AUVP</h3>
+                      <h3 className="text-lg font-bold text-white">Metas & Tetos</h3>
                       <p className="text-xs text-neutral-400">
                         Configuração da divisão percentual da renda doméstica
                       </p>
@@ -241,7 +260,7 @@ export default function App() {
 
                   <div className="p-4 rounded-2xl bg-neutral-900/60 border border-neutral-800 space-y-3">
                     <span className="text-xs font-semibold text-neutral-300 block">
-                      Metodologia AUVP Padrão:
+                      Metas Padrão de Tetos:
                     </span>
                     <p className="text-xs text-neutral-400 leading-relaxed">
                       A regra original baseia-se em: <strong>Custos Fixos (30%)</strong>,{' '}
@@ -290,21 +309,12 @@ export default function App() {
       <BottomNav
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        onOpenTransactionModal={() => setTransactionModalOpen(true)}
-        onOpenIncomeModal={() => setIncomeModalOpen(true)}
+        onOpenTransactionModal={handleOpenExpenseModal}
+        onOpenIncomeTransaction={handleOpenIncomeModal}
         onOpenCsvModal={() => setCsvModalOpen(true)}
       />
 
       {/* Modais Globais */}
-      <IncomeModal
-        isOpen={incomeModalOpen}
-        onClose={() => setIncomeModalOpen(false)}
-        currentIncome={totalIncome}
-        onSave={updateIncome}
-        month={month}
-        year={year}
-      />
-
       <CategoryGoalsModal
         isOpen={goalsModalOpen}
         onClose={() => setGoalsModalOpen(false)}
@@ -317,6 +327,8 @@ export default function App() {
         onClose={() => setTransactionModalOpen(false)}
         categories={categories}
         onSave={createTransaction}
+        initialType={transactionModalType}
+        initialDescription={transactionModalDescription}
       />
 
       <CsvUploadModal

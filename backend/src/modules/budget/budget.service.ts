@@ -44,29 +44,44 @@ export class BudgetService {
       orderBy: { defaultPct: 'desc' },
     });
 
-    // Obter transações de despesa do orçamento
-    const expenseTransactions = await prisma.transaction.findMany({
+    // Obter todas as transações do orçamento (despesas e rendas)
+    const allTransactions = await prisma.transaction.findMany({
       where: {
         monthlyBudgetId: budget.id,
-        type: 'EXPENSE',
       },
     });
 
-    // Somar despesas totais e por categoria
+    // Somar rendas, despesas totais e despesas por categoria
+    let totalIncomeFromTxs = 0;
     let totalSpent = 0;
     const spentByCategory = new Map<string, number>();
 
-    for (const tx of expenseTransactions) {
-      totalSpent += tx.amount;
-      if (tx.categoryId) {
-        const current = spentByCategory.get(tx.categoryId) || 0;
-        spentByCategory.set(tx.categoryId, current + tx.amount);
+    for (const tx of allTransactions) {
+      if (tx.type === 'INCOME') {
+        totalIncomeFromTxs += tx.amount;
+      } else {
+        totalSpent += tx.amount;
+        if (tx.categoryId) {
+          const current = spentByCategory.get(tx.categoryId) || 0;
+          spentByCategory.set(tx.categoryId, current + tx.amount);
+        }
       }
+    }
+
+    // A renda do mês é calculada estritamente a partir da soma dos lançamentos de renda (INCOME)
+    const effectiveIncome = totalIncomeFromTxs;
+
+    // Sincroniza no banco caso necessário
+    if (budget.totalIncome !== effectiveIncome) {
+      await prisma.monthlyBudget.update({
+        where: { id: budget.id },
+        data: { totalIncome: effectiveIncome },
+      });
     }
 
     // Consolidar dados de cada categoria
     const categorySummaries: CategorySummaryItemDTO[] = categories.map((cat) => {
-      const ceilingAmount = calculateCeiling(budget.totalIncome, cat.defaultPct);
+      const ceilingAmount = calculateCeiling(effectiveIncome, cat.defaultPct);
       const spentAmount = spentByCategory.get(cat.id) || 0;
       const usedPct = calculateUsedPct(spentAmount, ceilingAmount);
       const totalRealPct = calculateTotalRealPct(spentAmount, totalSpent);
@@ -83,12 +98,12 @@ export class BudgetService {
       };
     });
 
-    const balance = calculateBalance(budget.totalIncome, totalSpent);
+    const balance = calculateBalance(effectiveIncome, totalSpent);
 
     return {
       month: budget.month,
       year: budget.year,
-      totalIncome: budget.totalIncome,
+      totalIncome: effectiveIncome,
       totalSpent,
       balance,
       categories: categorySummaries,
@@ -105,7 +120,7 @@ export class BudgetService {
       throw new Error('Renda mensal informada deve ser um número maior ou igual a zero (em centavos)');
     }
 
-    await prisma.monthlyBudget.upsert({
+    const budget = await prisma.monthlyBudget.upsert({
       where: {
         userId_month_year: {
           userId,
@@ -123,6 +138,37 @@ export class BudgetService {
         totalIncome: Math.round(data.totalIncome),
       },
     });
+
+    // Se a renda foi informada, cria ou atualiza um lançamento de INCOME correspondente
+    if (data.totalIncome > 0) {
+      const existingIncomeTx = await prisma.transaction.findFirst({
+        where: {
+          userId,
+          monthlyBudgetId: budget.id,
+          type: 'INCOME',
+        },
+        orderBy: { createdAt: 'asc' },
+      });
+
+      if (existingIncomeTx) {
+        await prisma.transaction.update({
+          where: { id: existingIncomeTx.id },
+          data: { amount: Math.round(data.totalIncome) },
+        });
+      } else {
+        await prisma.transaction.create({
+          data: {
+            userId,
+            monthlyBudgetId: budget.id,
+            description: 'Renda Mensal (Salário)',
+            amount: Math.round(data.totalIncome),
+            date: new Date(Date.UTC(year, month - 1, 5)),
+            type: 'INCOME',
+            source: 'MANUAL',
+          },
+        });
+      }
+    }
 
     return this.getBudgetSummary(userId, year, month);
   }

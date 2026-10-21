@@ -22,7 +22,7 @@ O nome **Teto** faz alusão conceitual à regra do **"teto de gastos"**, adaptan
 
 ## 📊 Metodologia Orçamentária
 
-O sistema utiliza por padrão a distribuição percentual de renda (estilo AUVP), customizável pelo usuário:
+O sistema utiliza por padrão a distribuição percentual equilibrada da renda, customizável pelo usuário:
 
 | Categoria | Percentual Padrão | Descrição |
 | :--- | :---: | :--- |

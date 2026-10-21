@@ -7,7 +7,7 @@ interface BottomNavProps {
   activeTab: NavTab;
   onTabChange: (tab: NavTab) => void;
   onOpenTransactionModal: () => void;
-  onOpenIncomeModal: () => void;
+  onOpenIncomeTransaction: () => void;
   onOpenCsvModal: () => void;
 }
 
@@ -15,7 +15,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   activeTab,
   onTabChange,
   onOpenTransactionModal,
-  onOpenIncomeModal,
+  onOpenIncomeTransaction,
   onOpenCsvModal,
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -36,7 +36,16 @@ export const BottomNav: React.FC<BottomNavProps> = ({
               <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center">
                 <Plus className="w-4 h-4" />
               </div>
-              <span>Novo Gasto / Receita</span>
+              <span>Novo Gasto</span>
+            </button>
+            <button
+              onClick={() => { setMenuOpen(false); onOpenIncomeTransaction(); }}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-neutral-200 hover:bg-neutral-800 hover:text-white transition"
+            >
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+                <DollarSign className="w-4 h-4" />
+              </div>
+              <span>+ Nova Renda / Salário</span>
             </button>
             <button
               onClick={() => { setMenuOpen(false); onOpenCsvModal(); }}
@@ -46,15 +55,6 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                 <Upload className="w-4 h-4" />
               </div>
               <span>Importar Fatura CSV</span>
-            </button>
-            <button
-              onClick={() => { setMenuOpen(false); onOpenIncomeModal(); }}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-neutral-200 hover:bg-neutral-800 hover:text-white transition"
-            >
-              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
-                <DollarSign className="w-4 h-4" />
-              </div>
-              <span>Ajustar Renda do Mês</span>
             </button>
           </div>
         </div>
