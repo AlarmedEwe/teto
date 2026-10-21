@@ -3,12 +3,12 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 const DEFAULT_CATEGORIES = [
-  { name: 'Custos Fixos', defaultPct: 30, colorHex: '#3b82f6' },
-  { name: 'Conforto', defaultPct: 10, colorHex: '#06b6d4' },
-  { name: 'Metas', defaultPct: 20, colorHex: '#f59e0b' },
-  { name: 'Prazeres', defaultPct: 10, colorHex: '#ec4899' },
-  { name: 'Investimentos', defaultPct: 25, colorHex: '#10b981' },
-  { name: 'Conhecimento', defaultPct: 5, colorHex: '#8b5cf6' },
+  { name: 'Custos Fixos', defaultPct: 30, colorHex: '#3b82f6', icon: 'house' },
+  { name: 'Conforto', defaultPct: 10, colorHex: '#06b6d4', icon: 'car' },
+  { name: 'Metas', defaultPct: 20, colorHex: '#f59e0b', icon: 'bullseye' },
+  { name: 'Prazeres', defaultPct: 10, colorHex: '#ec4899', icon: 'wine-glass' },
+  { name: 'Investimentos', defaultPct: 25, colorHex: '#10b981', icon: 'dollar-sign' },
+  { name: 'Conhecimento', defaultPct: 5, colorHex: '#8b5cf6', icon: 'graduation-cap' },
 ];
 
 async function main() {
@@ -26,7 +26,7 @@ async function main() {
 
   console.log(`👤 Usuário configurado: ${user.name} (${user.id})`);
 
-  // Cadastrar categorias padrão se não existirem
+  // Cadastrar ou atualizar categorias padrão com seus ícones
   for (const cat of DEFAULT_CATEGORIES) {
     const existing = await prisma.category.findFirst({
       where: {
@@ -42,11 +42,18 @@ async function main() {
           name: cat.name,
           defaultPct: cat.defaultPct,
           colorHex: cat.colorHex,
+          icon: cat.icon,
         },
       });
-      console.log(`  ➕ Categoria criada: ${cat.name} (${cat.defaultPct}%)`);
+      console.log(`  ➕ Categoria criada: ${cat.name} (${cat.defaultPct}%) com ícone ${cat.icon}`);
     } else {
-      console.log(`  ✓ Categoria existente: ${cat.name}`);
+      await prisma.category.update({
+        where: { id: existing.id },
+        data: {
+          icon: cat.icon,
+        },
+      });
+      console.log(`  ✓ Categoria atualizada com ícone: ${cat.name} -> ${cat.icon}`);
     }
   }
 

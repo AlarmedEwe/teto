@@ -95,6 +95,7 @@ export class BudgetService {
         usedPct,
         totalRealPct,
         colorHex: cat.colorHex,
+        icon: cat.icon || null,
       };
     });
 

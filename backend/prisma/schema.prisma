@@ -36,6 +36,7 @@ model Category {
   name            String
   defaultPct      Int             @map("default_pct")
   colorHex        String          @map("color_hex")
+  icon            String?         @map("icon")
 
   user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   transactions    Transaction[]

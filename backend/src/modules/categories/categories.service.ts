@@ -15,6 +15,7 @@ export class CategoriesService {
         name: c.name,
         defaultPct: c.defaultPct,
         colorHex: c.colorHex,
+        icon: c.icon || null,
       })),
     };
   }
@@ -48,6 +49,7 @@ export class CategoriesService {
           data: {
             defaultPct: cat.defaultPct,
             ...(cat.colorHex ? { colorHex: cat.colorHex } : {}),
+            ...(cat.icon !== undefined ? { icon: cat.icon } : {}),
           },
         })
       )

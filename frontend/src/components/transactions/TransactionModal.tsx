@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Plus, Calendar, Tag, DollarSign, Pencil, Trash2 } from 'lucide-react';
 import { CategorySummaryItemDTO, CreateTransactionDTO, TransactionResponseDTO, TransactionType } from '@teto/types';
+import { CategoryIcon } from '../common/CategoryIcon.js';
 
 interface TransactionModalProps {
   isOpen: boolean;
@@ -220,25 +221,44 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
             </div>
           </div>
 
-          {/* Categoria */}
+          {/* Categoria com ícones FontAwesome */}
           {type === TransactionType.EXPENSE && (
             <div>
-              <label className="text-xs font-semibold text-neutral-300 block mb-1">
+              <label className="text-xs font-semibold text-neutral-300 block mb-2">
                 Categoria & Teto
               </label>
-              <div className="relative">
-                <Tag className="w-4 h-4 text-neutral-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <select
-                  value={categoryId}
-                  onChange={(e) => setCategoryId(e.target.value)}
-                  className="w-full bg-neutral-900 border border-neutral-700/80 rounded-xl py-2 pl-9 pr-3 text-white text-sm focus:outline-none focus:border-amber-500 transition appearance-none"
-                >
-                  {categories.map((c) => (
-                    <option key={c.categoryId} value={c.categoryId}>
-                      {c.name} ({c.targetPct}%)
-                    </option>
-                  ))}
-                </select>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {categories.map((c) => {
+                  const isSelected = categoryId === c.categoryId;
+                  return (
+                    <button
+                      key={c.categoryId}
+                      type="button"
+                      onClick={() => setCategoryId(c.categoryId)}
+                      className={`p-2 rounded-xl border text-left flex items-center gap-2.5 transition-all ${
+                        isSelected
+                          ? 'bg-neutral-800 border-amber-500 shadow-md ring-1 ring-amber-500/50'
+                          : 'bg-neutral-900/80 border-neutral-800 hover:border-neutral-700 hover:bg-neutral-800/50'
+                      }`}
+                    >
+                      <CategoryIcon
+                        icon={c.icon}
+                        categoryName={c.name}
+                        colorHex={c.colorHex}
+                        variant={isSelected ? 'solid-circle' : 'badge'}
+                        size="xs"
+                      />
+                      <div className="min-w-0">
+                        <span className="text-xs font-semibold text-white block truncate leading-tight">
+                          {c.name}
+                        </span>
+                        <span className="text-[10px] text-neutral-400 font-mono">
+                          {c.targetPct}%
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}

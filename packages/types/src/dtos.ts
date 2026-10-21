@@ -12,6 +12,7 @@ export interface CategorySummaryItemDTO {
   usedPct: number;         // (spentAmount / ceilingAmount) * 100
   totalRealPct: number;    // (spentAmount / totalSpent do mês) * 100
   colorHex: string;
+  icon?: string | null;
 }
 
 export interface BudgetSummaryResponseDTO {
@@ -33,6 +34,7 @@ export interface UpdateCategoryItemDTO {
   id: string;
   defaultPct: number;
   colorHex?: string;
+  icon?: string | null;
 }
 
 export interface UpdateCategoriesDTO {

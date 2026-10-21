@@ -2,6 +2,7 @@ import React from 'react';
 import { Sliders, AlertCircle, TrendingUp, CheckCircle2 } from 'lucide-react';
 import { CategorySummaryItemDTO } from '@teto/types';
 import { formatCurrency } from '../../utils/formatters.js';
+import { CategoryIcon } from '../common/CategoryIcon.js';
 
 interface BudgetSummaryTableProps {
   categories: CategorySummaryItemDTO[];
@@ -72,9 +73,12 @@ export const BudgetSummaryTable: React.FC<BudgetSummaryTableProps> = ({
                   {/* Nome & Meta */}
                   <td className="py-3 px-3">
                     <div className="flex items-center gap-2.5">
-                      <span
-                        className="w-2.5 h-2.5 rounded-full shrink-0 shadow-sm"
-                        style={{ backgroundColor: c.colorHex }}
+                      <CategoryIcon
+                        icon={c.icon}
+                        categoryName={c.name}
+                        colorHex={c.colorHex}
+                        variant="badge"
+                        size="xs"
                       />
                       <span className="text-neutral-100 font-semibold group-hover:text-white transition">
                         {c.name}
@@ -172,12 +176,15 @@ export const BudgetSummaryTable: React.FC<BudgetSummaryTableProps> = ({
               key={c.categoryId}
               className="p-3 rounded-2xl bg-neutral-900/80 border border-neutral-800/80 space-y-2 shadow-sm"
             >
-              {/* Linha Única: [Nome + Meta] e [Gasto / Teto + Badge] */}
+              {/* Linha Única: [Ícone + Nome + Meta] e [Gasto / Teto + Badge] */}
               <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2 min-w-0">
-                  <span
-                    className="w-2.5 h-2.5 rounded-full shrink-0 shadow-sm"
-                    style={{ backgroundColor: c.colorHex }}
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <CategoryIcon
+                    icon={c.icon}
+                    categoryName={c.name}
+                    colorHex={c.colorHex}
+                    variant="solid-circle"
+                    size="xs"
                   />
                   <span className="text-xs font-bold text-neutral-200 truncate">
                     {c.name}

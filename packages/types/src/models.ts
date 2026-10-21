@@ -13,6 +13,7 @@ export interface Category {
   name: string;
   defaultPct: number; // Ex: 30 para 30%
   colorHex: string;
+  icon?: string | null;
 }
 
 export interface MonthlyBudget {
