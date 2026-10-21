@@ -4,6 +4,26 @@ Este documento registra os marcos e tarefas atômicas concluídas no projeto par
 
 ---
 
+### [2026-10-21] - Marco 5: Frontend Mobile-First (Design System & Telas)
+- [x] Criação da especificação técnica [specs/05-frontend-mobile-first.md](file:///media/upd8-guilherme/TOSHIBA%20EXT/G/dev/node/teto/specs/05-frontend-mobile-first.md).
+- [x] Setup do Tailwind CSS com tema Dark Mode (`neutral-950`/`neutral-900`), acentos em âmbar (`amber-500`), utilitários glassmorphism e fonte Inter via Google Fonts.
+- [x] Implementação do cliente HTTP tipado (`services/api.ts`) consumindo diretamente os contratos de `@teto/types`.
+- [x] Implementação do hook de gerenciamento de estado orçamentário (`hooks/useBudget.ts`) com navegação de meses e sincronização reativa.
+- [x] Implementação dos componentes de layout:
+  - `Header`: Seletor de mês/ano, logotipo Teto e cards de renda, gasto total e saldo líquido em tempo real.
+  - `BottomNav`: Navegação móvel fixa inferior com Floating Action Button (`+`) de ações rápidas.
+  - `Sidebar`: Navegação desktop lateral com atalhos de lançamentos e status do teto.
+- [x] Implementação do gráfico Donut AUVP interativo com Recharts (`DonutBudgetChart.tsx`) exibindo a fatia de cada categoria no bolo de gastos do mês.
+- [x] Implementação dos cards de categorias (`CategoryCard.tsx`) com barras de progresso semânticas (verde para dentro do teto, âmbar para alerta e vermelho para estouro) e cálculo de valores restantes.
+- [x] Implementação dos 4 modais interativos:
+  - `IncomeModal`: Atualização da renda mensal líquida base com recálculo automático instantâneo dos tetos.
+  - `CategoryGoalsModal`: Edição das porcentagens da divisão AUVP com limitador estrito de 100%.
+  - `TransactionModal`: Formulário de lançamento manual de despesas ou receitas extras.
+  - `CsvUploadModal`: Drag-and-drop de arquivos `.csv` com conciliação rápida pós-importação.
+- [x] Validação completa do build de produção via `npm run build` e typecheck sem erros.
+
+---
+
 ### [2026-10-20] - Marco 4: Parser de CSV & Projeção de Parcelamentos
 - [x] Criação da especificação técnica [specs/04-parser-csv-e-parcelamento.md](file:///media/upd8-guilherme/TOSHIBA%20EXT/G/dev/node/teto/specs/04-parser-csv-e-parcelamento.md).
 - [x] Implementação do detector inteligente de parcelamento por regex (`installment-detector.ts`) suportando `(02/05)`, `[2/10]`, `Parcela 3 de 12`, `01/10` e blindagem contra falsos positivos de datas (`15/10/2026`).

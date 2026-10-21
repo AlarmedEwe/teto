@@ -53,11 +53,12 @@ Backlog de desenvolvimento organizado por marcos técnicos e guiado pelas especi
 ---
 
 ## 🎯 Marco 5: Frontend Mobile-First (Design System & Telas)
-- [ ] Setup do Vite + React + Tailwind CSS com tema Dark Mode / Âmbar.
-- [ ] Componentes de navegação: Bottom Navigation Bar (Mobile) e Sidebar retrátil (Desktop).
-- [ ] Componente Donut Chart com Recharts para visualização AUVP.
-- [ ] Cards de categorias com barras de progresso semânticas (verde/âmbar/vermelho).
-- [ ] Drawer / Modal de lançamento rápido (`+`) e upload de CSV.
+*Especificação de referência:* [specs/05-frontend-mobile-first.md](file:///media/upd8-guilherme/TOSHIBA%20EXT/G/dev/node/teto/specs/05-frontend-mobile-first.md)
+- [x] Setup do Vite + React + Tailwind CSS com tema Dark Mode / Âmbar.
+- [x] Componentes de navegação: Bottom Navigation Bar (Mobile) e Sidebar retrátil (Desktop).
+- [x] Componente Donut Chart com Recharts para visualização AUVP.
+- [x] Cards de categorias com barras de progresso semânticas (verde/âmbar/vermelho).
+- [x] Drawer / Modal de lançamento rápido (`+`) e upload de CSV.
 
 ---
 
