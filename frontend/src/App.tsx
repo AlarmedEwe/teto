@@ -4,7 +4,7 @@ import { Header } from './components/layout/Header.js';
 import { BottomNav, NavTab } from './components/layout/BottomNav.js';
 import { Sidebar } from './components/layout/Sidebar.js';
 import { DonutBudgetChart } from './components/charts/DonutBudgetChart.js';
-import { CategoryCard } from './components/budget/CategoryCard.js';
+import { BudgetSummaryTable } from './components/budget/BudgetSummaryTable.js';
 import { CategoryGoalsModal } from './components/budget/CategoryGoalsModal.js';
 import { TransactionModal } from './components/transactions/TransactionModal.js';
 import { TransactionList } from './components/transactions/TransactionList.js';
@@ -175,27 +175,14 @@ export default function App() {
                       </div>
                     </div>
 
-                    {/* Cards de Tetos por Categoria (Coluna Direita no Desktop) */}
-                    <div className="lg:col-span-7 space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="text-base font-bold text-white">Tetos Orçamentários</h3>
-                          <p className="text-xs text-neutral-400">Limites rígidos calculados por categoria</p>
-                        </div>
-                        <button
-                          onClick={() => setGoalsModalOpen(true)}
-                          className="text-xs font-semibold text-amber-400 hover:text-amber-300 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 transition"
-                        >
-                          <Sliders className="w-3.5 h-3.5" />
-                          <span>Ajustar Metas</span>
-                        </button>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                        {categories.map((cat) => (
-                          <CategoryCard key={cat.categoryId} category={cat} />
-                        ))}
-                      </div>
+                    {/* Resumo Orçamentário em Tabela (Coluna Direita no Desktop) */}
+                    <div className="lg:col-span-7">
+                      <BudgetSummaryTable
+                        categories={categories}
+                        totalSpent={totalSpent}
+                        totalIncome={totalIncome}
+                        onOpenGoalsModal={() => setGoalsModalOpen(true)}
+                      />
                     </div>
                   </div>
 
