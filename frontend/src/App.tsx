@@ -10,7 +10,7 @@ import { TransactionModal } from './components/transactions/TransactionModal.js'
 import { TransactionList } from './components/transactions/TransactionList.js';
 import { CsvUploadModal } from './components/csv-uploader/CsvUploadModal.js';
 import { Plus, Sliders, Upload, RefreshCw, AlertCircle } from 'lucide-react';
-import { TransactionType } from '@teto/types';
+import { TransactionResponseDTO, TransactionType, CreateTransactionDTO } from '@teto/types';
 import { formatCurrency } from './utils/formatters.js';
 
 export default function App() {
@@ -26,6 +26,8 @@ export default function App() {
     refresh,
     updateCategories,
     createTransaction,
+    updateTransaction,
+    deleteTransaction,
     importCsv,
     updateTransactionCategory,
   } = useBudget();
@@ -33,6 +35,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<NavTab>('dashboard');
   const [goalsModalOpen, setGoalsModalOpen] = useState(false);
   const [transactionModalOpen, setTransactionModalOpen] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState<TransactionResponseDTO | null>(null);
   const [transactionModalType, setTransactionModalType] = useState<TransactionType>(TransactionType.EXPENSE);
   const [transactionModalDescription, setTransactionModalDescription] = useState<string>('');
   const [csvModalOpen, setCsvModalOpen] = useState(false);
@@ -43,15 +46,36 @@ export default function App() {
   const balance = budget?.balance || 0;
 
   const handleOpenExpenseModal = () => {
+    setEditingTransaction(null);
     setTransactionModalType(TransactionType.EXPENSE);
     setTransactionModalDescription('');
     setTransactionModalOpen(true);
   };
 
   const handleOpenIncomeModal = () => {
+    setEditingTransaction(null);
     setTransactionModalType(TransactionType.INCOME);
     setTransactionModalDescription('Salário');
     setTransactionModalOpen(true);
+  };
+
+  const handleEditTransaction = (tx: TransactionResponseDTO) => {
+    setEditingTransaction(tx);
+    setTransactionModalType(tx.type);
+    setTransactionModalDescription(tx.description);
+    setTransactionModalOpen(true);
+  };
+
+  const handleSaveTransaction = async (data: CreateTransactionDTO) => {
+    if (editingTransaction) {
+      await updateTransaction(editingTransaction.id, data);
+    } else {
+      await createTransaction(data);
+    }
+  };
+
+  const handleDeleteTransaction = async (txId: string) => {
+    await deleteTransaction(txId);
   };
 
   return (
@@ -191,6 +215,7 @@ export default function App() {
                       transactions={transactions.slice(0, 5)}
                       categories={categories}
                       onUpdateCategory={updateTransactionCategory}
+                      onEditTransaction={handleEditTransaction}
                     />
                   </div>
                 </div>
@@ -235,6 +260,7 @@ export default function App() {
                     transactions={transactions}
                     categories={categories}
                     onUpdateCategory={updateTransactionCategory}
+                    onEditTransaction={handleEditTransaction}
                   />
                 </div>
               )}
@@ -324,11 +350,16 @@ export default function App() {
 
       <TransactionModal
         isOpen={transactionModalOpen}
-        onClose={() => setTransactionModalOpen(false)}
+        onClose={() => {
+          setTransactionModalOpen(false);
+          setEditingTransaction(null);
+        }}
         categories={categories}
-        onSave={createTransaction}
+        onSave={handleSaveTransaction}
+        onDelete={handleDeleteTransaction}
         initialType={transactionModalType}
         initialDescription={transactionModalDescription}
+        editingTransaction={editingTransaction}
       />
 
       <CsvUploadModal

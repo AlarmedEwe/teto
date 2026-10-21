@@ -1,7 +1,11 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { TransactionsService } from './transactions.service.js';
 import { getDefaultUser } from '../../shared/utils/get-default-user.js';
-import { CreateTransactionDTO, UpdateTransactionCategoryDTO } from '@teto/types';
+import { CreateTransactionDTO, UpdateTransactionCategoryDTO, UpdateTransactionDTO } from '@teto/types';
+
+interface TransactionParams {
+  id: string;
+}
 
 interface TransactionCategoryParams {
   id: string;
@@ -86,6 +90,44 @@ export class TransactionsController {
         statusCode: 400,
         error: 'Bad Request',
         message: err.message || 'Erro ao atualizar categoria da transação',
+      });
+    }
+  }
+
+  async update(
+    request: FastifyRequest<{ Params: TransactionParams; Body: UpdateTransactionDTO }>,
+    reply: FastifyReply
+  ) {
+    const user = await getDefaultUser();
+    try {
+      const result = await this.transactionsService.updateTransaction(
+        user.id,
+        request.params.id,
+        request.body
+      );
+      return reply.status(200).send(result);
+    } catch (err: any) {
+      return reply.status(400).send({
+        statusCode: 400,
+        error: 'Bad Request',
+        message: err.message || 'Erro ao atualizar transação',
+      });
+    }
+  }
+
+  async delete(
+    request: FastifyRequest<{ Params: TransactionParams }>,
+    reply: FastifyReply
+  ) {
+    const user = await getDefaultUser();
+    try {
+      await this.transactionsService.deleteTransaction(user.id, request.params.id);
+      return reply.status(204).send();
+    } catch (err: any) {
+      return reply.status(400).send({
+        statusCode: 400,
+        error: 'Bad Request',
+        message: err.message || 'Erro ao excluir transação',
       });
     }
   }

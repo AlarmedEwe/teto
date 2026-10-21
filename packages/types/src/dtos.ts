@@ -60,6 +60,14 @@ export interface UpdateTransactionCategoryDTO {
   categoryId: string | null;
 }
 
+export interface UpdateTransactionDTO {
+  categoryId?: string | null;
+  description?: string;
+  amount?: number;          // Em centavos (inteiro)
+  date?: string;            // YYYY-MM-DD
+  type?: TransactionType;
+}
+
 // --- DTOs de Importação de Cartão de Crédito (CSV) ---
 
 export interface InstallmentInfoDTO {

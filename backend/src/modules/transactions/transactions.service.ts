@@ -9,6 +9,7 @@ import {
   TransactionSource,
   TransactionType,
   UpdateTransactionCategoryDTO,
+  UpdateTransactionDTO,
 } from '@teto/types';
 
 export class TransactionsService {
@@ -268,6 +269,85 @@ export class TransactionsService {
       totalInstallments: updated.totalInstallments,
       createdAt: updated.createdAt,
     };
+  }
+
+  /**
+   * Atualização completa de transação existente (descrição, valor, data, categoria, tipo).
+   */
+  async updateTransaction(
+    userId: string,
+    transactionId: string,
+    data: UpdateTransactionDTO
+  ): Promise<TransactionResponseDTO> {
+    const existing = await prisma.transaction.findFirst({
+      where: { id: transactionId, userId },
+    });
+
+    if (!existing) {
+      throw new Error('Transação não encontrada');
+    }
+
+    let monthlyBudgetId = existing.monthlyBudgetId;
+
+    // Se a data foi alterada, verificar se pertence a outro mês/ano e associar ao monthlyBudget correto
+    let dateObj = existing.date;
+    if (data.date) {
+      dateObj = new Date(data.date);
+      const year = dateObj.getUTCFullYear();
+      const month = dateObj.getUTCMonth() + 1;
+      const budget = await this.getOrCreateBudget(userId, year, month);
+      monthlyBudgetId = budget.id;
+    }
+
+    const type = data.type || (existing.type as TransactionType);
+    const categoryId = type === TransactionType.INCOME
+      ? null
+      : (data.categoryId !== undefined ? data.categoryId : existing.categoryId);
+
+    const updated = await prisma.transaction.update({
+      where: { id: transactionId },
+      data: {
+        description: data.description !== undefined ? data.description.trim() : existing.description,
+        amount: data.amount !== undefined ? Math.round(data.amount) : existing.amount,
+        date: dateObj,
+        categoryId,
+        type,
+        monthlyBudgetId,
+      },
+    });
+
+    return {
+      id: updated.id,
+      userId: updated.userId,
+      categoryId: updated.categoryId,
+      monthlyBudgetId: updated.monthlyBudgetId,
+      description: updated.description,
+      amount: updated.amount,
+      date: updated.date.toISOString().split('T')[0],
+      type: updated.type as TransactionType,
+      source: updated.source as TransactionSource,
+      installmentGroupId: updated.installmentGroupId,
+      currentInstallment: updated.currentInstallment,
+      totalInstallments: updated.totalInstallments,
+      createdAt: updated.createdAt,
+    };
+  }
+
+  /**
+   * Exclusão de uma transação.
+   */
+  async deleteTransaction(userId: string, transactionId: string): Promise<void> {
+    const existing = await prisma.transaction.findFirst({
+      where: { id: transactionId, userId },
+    });
+
+    if (!existing) {
+      throw new Error('Transação não encontrada');
+    }
+
+    await prisma.transaction.delete({
+      where: { id: transactionId },
+    });
   }
 
   /**

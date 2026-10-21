@@ -8,4 +8,6 @@ export async function transactionsRoutes(app: FastifyInstance) {
   app.post('/', controller.create.bind(controller));
   app.post('/import-csv', controller.importCsv.bind(controller));
   app.patch('/:id/category', controller.updateCategory.bind(controller));
+  app.put('/:id', controller.update.bind(controller));
+  app.delete('/:id', controller.delete.bind(controller));
 }

@@ -5,6 +5,7 @@ import {
   ImportCsvResponseDTO,
   TransactionResponseDTO,
   UpdateCategoryItemDTO,
+  UpdateTransactionDTO,
 } from '@teto/types';
 import { api } from '../services/api.js';
 
@@ -84,6 +85,16 @@ export function useBudget() {
     await loadData();
   };
 
+  const updateTransaction = async (txId: string, data: UpdateTransactionDTO) => {
+    await api.updateTransaction(txId, data);
+    await loadData();
+  };
+
+  const deleteTransaction = async (txId: string) => {
+    await api.deleteTransaction(txId);
+    await loadData();
+  };
+
   return {
     year,
     month,
@@ -97,6 +108,8 @@ export function useBudget() {
     updateIncome,
     updateCategories,
     createTransaction,
+    updateTransaction,
+    deleteTransaction,
     importCsv,
     updateTransactionCategory,
   };

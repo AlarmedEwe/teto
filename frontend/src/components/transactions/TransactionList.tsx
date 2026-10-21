@@ -1,5 +1,5 @@
 import React from 'react';
-import { CreditCard, Calendar, Tag, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
+import { CreditCard, Calendar, Tag, ArrowUpRight, ArrowDownLeft, Pencil } from 'lucide-react';
 import { CategorySummaryItemDTO, TransactionResponseDTO, TransactionType } from '@teto/types';
 import { formatCurrency, formatDate } from '../../utils/formatters.js';
 
@@ -7,12 +7,14 @@ interface TransactionListProps {
   transactions: TransactionResponseDTO[];
   categories: CategorySummaryItemDTO[];
   onUpdateCategory: (transactionId: string, categoryId: string | null) => Promise<void>;
+  onEditTransaction?: (transaction: TransactionResponseDTO) => void;
 }
 
 export const TransactionList: React.FC<TransactionListProps> = ({
   transactions,
   categories,
   onUpdateCategory,
+  onEditTransaction,
 }) => {
   const categoryMap = new Map(categories.map((c) => [c.categoryId, c]));
 
@@ -102,16 +104,28 @@ export const TransactionList: React.FC<TransactionListProps> = ({
               </div>
             </div>
 
-            {/* Valor */}
-            <div className="text-right shrink-0">
-              <span
-                className={`text-sm font-bold font-mono ${
-                  isExpense ? 'text-neutral-100' : 'text-emerald-400'
-                }`}
-              >
-                {isExpense ? '-' : '+'}
-                {formatCurrency(tx.amount)}
-              </span>
+            {/* Valor e Ações */}
+            <div className="flex items-center gap-2.5 shrink-0">
+              <div className="text-right">
+                <span
+                  className={`text-sm font-bold font-mono ${
+                    isExpense ? 'text-neutral-100' : 'text-emerald-400'
+                  }`}
+                >
+                  {isExpense ? '-' : '+'}
+                  {formatCurrency(tx.amount)}
+                </span>
+              </div>
+
+              {onEditTransaction && (
+                <button
+                  onClick={() => onEditTransaction(tx)}
+                  className="p-1.5 rounded-lg text-neutral-400 hover:text-amber-400 hover:bg-neutral-800 transition"
+                  title="Editar lançamento"
+                >
+                  <Pencil className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
           </div>
         );

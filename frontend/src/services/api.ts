@@ -7,6 +7,7 @@ import {
   UpdateCategoriesDTO,
   UpdateIncomeDTO,
   UpdateTransactionCategoryDTO,
+  UpdateTransactionDTO,
 } from '@teto/types';
 
 const BASE_URL = '/api';
@@ -73,6 +74,19 @@ export const api = {
     return request<TransactionResponseDTO>(`/transactions/${id}/category`, {
       method: 'PATCH',
       body: JSON.stringify({ categoryId } as UpdateTransactionCategoryDTO),
+    });
+  },
+
+  async updateTransaction(id: string, data: UpdateTransactionDTO): Promise<TransactionResponseDTO> {
+    return request<TransactionResponseDTO>(`/transactions/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async deleteTransaction(id: string): Promise<void> {
+    await request<void>(`/transactions/${id}`, {
+      method: 'DELETE',
     });
   },
 

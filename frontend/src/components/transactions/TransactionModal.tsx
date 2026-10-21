@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
-import { X, Plus, Calendar, Tag, DollarSign } from 'lucide-react';
-import { CategorySummaryItemDTO, CreateTransactionDTO, TransactionType } from '@teto/types';
+import React, { useState, useEffect } from 'react';
+import { X, Plus, Calendar, Tag, DollarSign, Pencil, Trash2 } from 'lucide-react';
+import { CategorySummaryItemDTO, CreateTransactionDTO, TransactionResponseDTO, TransactionType } from '@teto/types';
 
 interface TransactionModalProps {
   isOpen: boolean;
   onClose: () => void;
   categories: CategorySummaryItemDTO[];
   onSave: (data: CreateTransactionDTO) => Promise<void>;
+  onDelete?: (id: string) => Promise<void>;
   defaultDate?: string;
   initialType?: TransactionType;
   initialDescription?: string;
+  editingTransaction?: TransactionResponseDTO | null;
 }
 
 export const TransactionModal: React.FC<TransactionModalProps> = ({
@@ -17,29 +19,43 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
   onClose,
   categories,
   onSave,
+  onDelete,
   defaultDate,
   initialType = TransactionType.EXPENSE,
   initialDescription = '',
+  editingTransaction = null,
 }) => {
+  const isEditing = Boolean(editingTransaction);
   const [description, setDescription] = useState(initialDescription);
   const [amountStr, setAmountStr] = useState('');
   const [date, setDate] = useState(defaultDate || new Date().toISOString().split('T')[0]);
   const [categoryId, setCategoryId] = useState<string>(categories[0]?.categoryId || '');
   const [type, setType] = useState<TransactionType>(initialType);
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Sincroniza estado inicial sempre que o modal abre
-  React.useEffect(() => {
+  // Sincroniza estado inicial sempre que o modal abre ou editingTransaction muda
+  useEffect(() => {
     if (isOpen) {
-      setType(initialType);
-      setDescription(initialDescription || (initialType === TransactionType.INCOME ? 'Salário' : ''));
-      setAmountStr('');
-      setDate(defaultDate || new Date().toISOString().split('T')[0]);
-      setCategoryId(categories[0]?.categoryId || '');
       setError(null);
+      if (editingTransaction) {
+        setType(editingTransaction.type);
+        setDescription(editingTransaction.description);
+        // Formatar valor em reais com vírgula para edição intuitiva
+        const formattedAmount = (editingTransaction.amount / 100).toFixed(2).replace('.', ',');
+        setAmountStr(formattedAmount);
+        setDate(editingTransaction.date);
+        setCategoryId(editingTransaction.categoryId || categories[0]?.categoryId || '');
+      } else {
+        setType(initialType);
+        setDescription(initialDescription || (initialType === TransactionType.INCOME ? 'Salário' : ''));
+        setAmountStr('');
+        setDate(defaultDate || new Date().toISOString().split('T')[0]);
+        setCategoryId(categories[0]?.categoryId || '');
+      }
     }
-  }, [isOpen, initialType, initialDescription, defaultDate, categories]);
+  }, [isOpen, editingTransaction, initialType, initialDescription, defaultDate, categories]);
 
   if (!isOpen) return null;
 
@@ -78,6 +94,21 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
     }
   };
 
+  const handleDelete = async () => {
+    if (!editingTransaction || !onDelete) return;
+    if (!window.confirm(`Deseja realmente excluir "${editingTransaction.description}"?`)) return;
+
+    try {
+      setDeleting(true);
+      await onDelete(editingTransaction.id);
+      onClose();
+    } catch (err: any) {
+      setError(err.message || 'Erro ao excluir transação');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="glass-dropdown border border-neutral-800 rounded-3xl max-w-sm w-full p-6 shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
@@ -94,14 +125,26 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
               ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
               : 'bg-amber-500/10 border border-amber-500/20 text-amber-400'
           }`}>
-            <Plus className="w-5 h-5 stroke-[2.5]" />
+            {isEditing ? (
+              <Pencil className="w-5 h-5" />
+            ) : (
+              <Plus className="w-5 h-5 stroke-[2.5]" />
+            )}
           </div>
           <div>
             <h3 className="text-base font-bold text-white">
-              {isIncome ? 'Lançar Renda / Receita' : 'Novo Gasto'}
+              {isEditing
+                ? 'Editar Lançamento'
+                : isIncome
+                ? 'Lançar Renda / Receita'
+                : 'Novo Gasto'}
             </h3>
             <p className="text-xs text-neutral-400">
-              {isIncome ? 'Salário, prestação de serviços ou entradas' : 'Despesa manual no teto orçamentário'}
+              {isEditing
+                ? 'Atualize os dados ou valor da transação'
+                : isIncome
+                ? 'Salário, prestação de serviços ou entradas'
+                : 'Despesa manual no teto orçamentário'}
             </p>
           </div>
         </div>
@@ -217,23 +260,43 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
           </div>
 
           <div className="flex gap-2 pt-2 border-t border-neutral-800">
+            {isEditing && onDelete && (
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={deleting || loading}
+                className="px-3.5 py-2.5 rounded-xl border border-rose-800/80 bg-rose-950/30 hover:bg-rose-900/50 text-rose-300 transition flex items-center justify-center shrink-0 disabled:opacity-50"
+                title="Excluir lançamento"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            )}
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2.5 rounded-xl border border-neutral-800 text-neutral-300 text-sm font-semibold hover:bg-neutral-800 transition"
+              disabled={loading || deleting}
+              className="flex-1 py-2.5 rounded-xl border border-neutral-800 text-neutral-300 text-sm font-semibold hover:bg-neutral-800 transition disabled:opacity-50"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || deleting}
               className={`flex-1 py-2.5 rounded-xl text-neutral-950 text-sm font-bold shadow-lg transition disabled:opacity-50 ${
                 isIncome
                   ? 'bg-emerald-400 hover:bg-emerald-300 shadow-emerald-500/20'
                   : 'bg-amber-500 hover:bg-amber-400 shadow-amber-500/20'
               }`}
             >
-              {loading ? 'Salvando...' : isIncome ? 'Lançar Renda' : 'Adicionar Despesa'}
+              {loading
+                ? 'Salvando...'
+                : deleting
+                ? 'Excluindo...'
+                : isEditing
+                ? 'Salvar Alterações'
+                : isIncome
+                ? 'Lançar Renda'
+                : 'Adicionar Despesa'}
             </button>
           </div>
         </form>
