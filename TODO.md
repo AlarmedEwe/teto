@@ -43,11 +43,12 @@ Backlog de desenvolvimento organizado por marcos técnicos e guiado pelas especi
 ---
 
 ## 🎯 Marco 4: Parser de CSV & Projeção de Parcelamentos
-- [ ] Implementar módulo de upload multipart/form-data.
-- [ ] Implementar parser tolerante a delimitadores (`,`, `;`) e separadores decimais.
-- [ ] Implementar regex de detecção de parcelamento (`02/05`, `Parcela 2 de 5`).
-- [ ] Implementar gerador de transações futuras com `installment_group_id`.
-- [ ] Testes unitários com fixtures de faturas reais (Nubank, Itaú, Inter).
+*Especificação de referência:* [specs/04-parser-csv-e-parcelamento.md](file:///media/upd8-guilherme/TOSHIBA%20EXT/G/dev/node/teto/specs/04-parser-csv-e-parcelamento.md)
+- [x] Implementar módulo de upload multipart/form-data.
+- [x] Implementar parser tolerante a delimitadores (`,`, `;`) e separadores decimais.
+- [x] Implementar regex de detecção de parcelamento (`02/05`, `Parcela 2 de 5`).
+- [x] Implementar gerador de transações futuras com `installment_group_id`.
+- [x] Testes unitários com fixtures de faturas reais (Nubank, Itaú, Inter).
 
 ---
 

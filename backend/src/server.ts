@@ -2,6 +2,7 @@ import 'dotenv/config';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import sensible from '@fastify/sensible';
+import multipart from '@fastify/multipart';
 import { prisma } from './shared/database/prisma.js';
 
 const app = Fastify({
@@ -17,6 +18,7 @@ const app = Fastify({
 
 // Registrar plugins fundamentais
 await app.register(sensible);
+await app.register(multipart, { limits: { fileSize: 10 * 1024 * 1024 } });
 await app.register(cors, {
   origin: true, // Em desenvolvimento, permite origens locais
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -45,10 +47,12 @@ app.get('/health', async (_request, reply) => {
 
 import { categoriesRoutes } from './modules/categories/categories.routes.js';
 import { budgetRoutes } from './modules/budget/budget.routes.js';
+import { transactionsRoutes } from './modules/transactions/transactions.routes.js';
 
 // Registrar rotas da API
 await app.register(categoriesRoutes, { prefix: '/api/categories' });
 await app.register(budgetRoutes, { prefix: '/api/budgets' });
+await app.register(transactionsRoutes, { prefix: '/api/transactions' });
 
 // Inicialização do servidor
 const PORT = Number(process.env.PORT) || 3333;

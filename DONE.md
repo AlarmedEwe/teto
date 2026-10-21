@@ -4,6 +4,21 @@ Este documento registra os marcos e tarefas atômicas concluídas no projeto par
 
 ---
 
+### [2026-10-20] - Marco 4: Parser de CSV & Projeção de Parcelamentos
+- [x] Criação da especificação técnica [specs/04-parser-csv-e-parcelamento.md](file:///media/upd8-guilherme/TOSHIBA%20EXT/G/dev/node/teto/specs/04-parser-csv-e-parcelamento.md).
+- [x] Implementação do detector inteligente de parcelamento por regex (`installment-detector.ts`) suportando `(02/05)`, `[2/10]`, `Parcela 3 de 12`, `01/10` e blindagem contra falsos positivos de datas (`15/10/2026`).
+- [x] Implementação do parser flexível de extratos CSV (`csv-parser.ts`) tolerante a delimitadores (`,`, `;`), separadores decimais (`.`, `,`) e padrões de data (ISO e BR).
+- [x] 100% de cobertura de testes unitários para o detector de parcelamento e parser de CSV (28 testes passando).
+- [x] Implementação do `TransactionsService` com projeção automática das $N - X$ parcelas futuras nos meses subsequentes com mesmo `installmentGroupId` e virada de ano correta.
+- [x] Implementação dos endpoints Fastify:
+  - `POST /api/transactions`: Lançamento manual de despesas ou receitas.
+  - `POST /api/transactions/import-csv`: Upload de arquivo multipart/form-data com retorno de estatísticas e lista de transações criadas.
+  - `PATCH /api/transactions/:id/category`: Conciliação rápida de categoria com atualização em lote para todas as parcelas do mesmo grupo.
+  - `GET /api/transactions`: Consulta de transações com filtros por ano e mês.
+- [x] Teste de integração end-to-end simulando upload real de fatura Nubank com compra parcelada em 5x gerando parcelas até janeiro de 2027.
+
+---
+
 ### [2026-10-20] - Marco 3: Módulo de Orçamento & Cálculo de Tetos
 - [x] Criação da especificação técnica [specs/03-orcamento-e-tetos.md](file:///media/upd8-guilherme/TOSHIBA%20EXT/G/dev/node/teto/specs/03-orcamento-e-tetos.md).
 - [x] Implementação de funções puras de cálculo matemático de tetos, percentual de uso e percentual real (`budget.calculator.ts`).
