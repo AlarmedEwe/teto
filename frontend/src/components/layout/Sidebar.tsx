@@ -1,6 +1,7 @@
 import React from 'react';
-import { LayoutDashboard, Receipt, Sliders, Plus, Upload, DollarSign, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, Receipt, Sliders, Plus, Upload, DollarSign, ShieldCheck, LogIn, LogOut } from 'lucide-react';
 import { NavTab } from './BottomNav.js';
+import { useAuth } from '../../contexts/AuthContext.js';
 
 interface SidebarProps {
   activeTab: NavTab;
@@ -17,6 +18,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenIncomeTransaction,
   onOpenCsvModal,
 }) => {
+  const { user, logout, setIsAuthModalOpen } = useAuth();
+
   return (
     <aside className="hidden sm:flex flex-col w-64 border-r border-neutral-800/80 bg-neutral-950/80 p-5 shrink-0 justify-between min-h-[calc(100vh-65px)]">
       <div className="space-y-6">
@@ -93,13 +96,36 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </div>
 
-      {/* Footer da Sidebar */}
-      <div className="pt-4 border-t border-neutral-800/80 text-xs text-neutral-400 space-y-1">
-        <div className="flex items-center gap-1.5 text-neutral-400">
-          <ShieldCheck className="w-3.5 h-3.5 text-amber-500" />
-          <span className="font-medium text-[11px]">Teto de Gastos Ativo</span>
+      {/* Footer da Sidebar com Usuário */}
+      <div className="pt-4 border-t border-neutral-800/80 space-y-2">
+        {user ? (
+          <div className="flex items-center justify-between gap-2 p-2 rounded-2xl bg-neutral-900/90 border border-neutral-800">
+            <div className="min-w-0">
+              <span className="text-xs font-bold text-white block truncate">{user.name}</span>
+              <span className="text-[10px] text-neutral-400 block truncate">{user.email}</span>
+            </div>
+            <button
+              onClick={logout}
+              title="Sair da conta"
+              className="p-1.5 rounded-xl text-neutral-400 hover:text-rose-400 hover:bg-neutral-800 transition"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => setIsAuthModalOpen(true)}
+            className="w-full py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500/20 text-xs font-bold transition flex items-center justify-center gap-1.5"
+          >
+            <LogIn className="w-3.5 h-3.5" />
+            <span>Acessar / Criar Conta</span>
+          </button>
+        )}
+
+        <div className="flex items-center gap-1.5 text-neutral-400 px-1">
+          <ShieldCheck className="w-3 h-3 text-amber-500 shrink-0" />
+          <span className="text-[10px]">Argon2id (RFC 9106) Ativo</span>
         </div>
-        <p className="text-[10px] text-neutral-400">Disciplina fiscal pessoal</p>
       </div>
     </aside>
   );

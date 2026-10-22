@@ -1,6 +1,8 @@
 import 'dotenv/config';
-import Fastify from 'fastify';
+import Fastify, { FastifyRequest, FastifyReply } from 'fastify';
 import cors from '@fastify/cors';
+import cookie from '@fastify/cookie';
+import jwt from '@fastify/jwt';
 import sensible from '@fastify/sensible';
 import multipart from '@fastify/multipart';
 import { prisma } from './shared/database/prisma.js';
@@ -20,8 +22,35 @@ const app = Fastify({
 await app.register(sensible);
 await app.register(multipart, { limits: { fileSize: 10 * 1024 * 1024 } });
 await app.register(cors, {
-  origin: true, // Em desenvolvimento, permite origens locais
+  origin: true,
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+});
+
+await app.register(cookie, {
+  secret: process.env.COOKIE_SECRET || 'teto-super-secret-cookie-salt-at-least-32-chars-long!',
+});
+
+await app.register(jwt, {
+  secret: process.env.JWT_SECRET || 'teto-argon2id-rfc9106-super-secret-jwt-key-32-bytes!',
+  cookie: {
+    cookieName: 'teto_token',
+    signed: false,
+  },
+});
+
+// Decorar hook de autenticação
+app.decorate('authenticate', async (request: FastifyRequest, reply: FastifyReply) => {
+  try {
+    const token = request.cookies.teto_token;
+    if (token) {
+      await request.jwtVerify({ onlyCookie: true });
+    } else {
+      await request.jwtVerify();
+    }
+  } catch (err) {
+    return reply.status(401).send({ error: 'Não autorizado. Faça login para continuar.' });
+  }
 });
 
 // Rota de Healthcheck com verificação de banco de dados
@@ -45,11 +74,15 @@ app.get('/health', async (_request, reply) => {
   }
 });
 
+import { authRoutes } from './modules/auth/auth.routes.js';
+import { workspacesRoutes } from './modules/workspaces/workspaces.routes.js';
 import { categoriesRoutes } from './modules/categories/categories.routes.js';
 import { budgetRoutes } from './modules/budget/budget.routes.js';
 import { transactionsRoutes } from './modules/transactions/transactions.routes.js';
 
 // Registrar rotas da API
+await app.register(authRoutes, { prefix: '/api/auth' });
+await app.register(workspacesRoutes, { prefix: '/api/workspaces' });
 await app.register(categoriesRoutes, { prefix: '/api/categories' });
 await app.register(budgetRoutes, { prefix: '/api/budgets' });
 await app.register(transactionsRoutes, { prefix: '/api/transactions' });

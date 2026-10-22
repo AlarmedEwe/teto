@@ -16,3 +16,19 @@ export enum StandardCategoryKey {
   INVESTIMENTOS = 'INVESTIMENTOS',
   CONHECIMENTO = 'CONHECIMENTO',
 }
+
+export enum WorkspaceType {
+  BUDGET = 'BUDGET',
+  CUMULATIVE = 'CUMULATIVE',
+}
+
+export enum WorkspaceMemberRole {
+  OWNER = 'OWNER',
+  MEMBER = 'MEMBER',
+}
+
+export enum WorkspaceInviteStatus {
+  PENDING = 'PENDING',
+  ACCEPTED = 'ACCEPTED',
+  EXPIRED = 'EXPIRED',
+}

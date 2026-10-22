@@ -18,9 +18,12 @@ export interface CategorySummaryItemDTO {
 export interface BudgetSummaryResponseDTO {
   month: number;
   year: number;
+  workspaceType?: import('./enums.js').WorkspaceType;
+  workspaceName?: string;
   totalIncome: number;     // Renda do mês em centavos
   totalSpent: number;      // Total de despesas do mês em centavos
   balance: number;         // totalIncome - totalSpent em centavos
+  cumulativeBalance?: number; // Saldo cumulativo histórico do espaço
   categories: CategorySummaryItemDTO[];
 }
 
@@ -91,4 +94,71 @@ export interface ImportCsvResponseDTO {
   transactionsCreated: number;
   pendingCategorization: number;
   items: ImportCsvItemDTO[];
+}
+
+// --- DTOs de Autenticação (Argon2id RFC 9106) ---
+
+export interface RegisterDTO {
+  name: string;
+  email: string;
+  password: string;
+}
+
+export interface LoginDTO {
+  email: string;
+  password: string;
+}
+
+export interface AuthUserDTO {
+  id: string;
+  name: string;
+  email: string;
+  activeWorkspaceId?: string;
+}
+
+export interface AuthResponseDTO {
+  user: AuthUserDTO;
+  message?: string;
+}
+
+// --- DTOs de Espaços (Workspaces) e Convites ---
+
+export interface CreateWorkspaceDTO {
+  name: string;
+  type: import('./enums.js').WorkspaceType;
+}
+
+export interface WorkspaceResponseDTO {
+  id: string;
+  name: string;
+  type: import('./enums.js').WorkspaceType;
+  ownerId: string;
+  role: import('./enums.js').WorkspaceMemberRole;
+  createdAt: Date;
+}
+
+export interface WorkspaceListResponseDTO {
+  workspaces: WorkspaceResponseDTO[];
+  activeWorkspaceId: string;
+}
+
+export interface InviteMemberDTO {
+  email: string;
+}
+
+export interface WorkspaceInviteResponseDTO {
+  id: string;
+  workspaceId: string;
+  workspaceName?: string;
+  email: string;
+  token: string;
+  status: import('./enums.js').WorkspaceInviteStatus;
+  expiresAt: Date;
+  inviteUrl?: string;
+}
+
+export interface AcceptInviteDTO {
+  token: string;
+  name?: string;
+  password?: string;
 }

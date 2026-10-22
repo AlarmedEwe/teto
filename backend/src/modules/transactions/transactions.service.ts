@@ -16,7 +16,31 @@ export class TransactionsService {
   /**
    * Obtém ou cria o MonthlyBudget correspondente para uma data específica.
    */
-  private async getOrCreateBudget(userId: string, year: number, month: number) {
+  private async getOrCreateBudget(userId: string, year: number, month: number, workspaceId?: string) {
+    if (workspaceId) {
+      let budget = await prisma.monthlyBudget.findFirst({
+        where: {
+          workspaceId,
+          month,
+          year,
+        },
+      });
+
+      if (!budget) {
+        budget = await prisma.monthlyBudget.create({
+          data: {
+            userId,
+            workspaceId,
+            month,
+            year,
+            totalIncome: 0,
+          },
+        });
+      }
+
+      return budget;
+    }
+
     return await prisma.monthlyBudget.upsert({
       where: {
         userId_month_year: {
@@ -38,16 +62,21 @@ export class TransactionsService {
   /**
    * Criação manual de transação única (gasto ou receita).
    */
-  async createTransaction(userId: string, data: CreateTransactionDTO): Promise<TransactionResponseDTO> {
+  async createTransaction(
+    userId: string,
+    data: CreateTransactionDTO,
+    workspaceId?: string
+  ): Promise<TransactionResponseDTO> {
     const dateObj = new Date(data.date);
     const year = dateObj.getUTCFullYear();
     const month = dateObj.getUTCMonth() + 1;
 
-    const budget = await this.getOrCreateBudget(userId, year, month);
+    const budget = await this.getOrCreateBudget(userId, year, month, workspaceId);
 
     const transaction = await prisma.transaction.create({
       data: {
         userId,
+        workspaceId: workspaceId || null,
         monthlyBudgetId: budget.id,
         categoryId: data.categoryId || null,
         description: data.description,
@@ -78,7 +107,7 @@ export class TransactionsService {
   /**
    * Importação inteligente de arquivo CSV com detecção e projeção automática de parcelas.
    */
-  async importCsv(userId: string, csvContent: string): Promise<ImportCsvResponseDTO> {
+  async importCsv(userId: string, csvContent: string, workspaceId?: string): Promise<ImportCsvResponseDTO> {
     const parsedRows = parseTransactionsCsv(csvContent);
     if (parsedRows.length === 0) {
       return {
@@ -89,9 +118,9 @@ export class TransactionsService {
       };
     }
 
-    // Carregar categorias existentes do usuário para mapeamento inteligente
+    // Carregar categorias existentes do espaço para mapeamento inteligente
     const categories = await prisma.category.findMany({
-      where: { userId },
+      where: workspaceId ? { workspaceId } : { userId },
     });
 
     let totalCreated = 0;
@@ -117,7 +146,7 @@ export class TransactionsService {
         pendingCategorization++;
       }
 
-      const budget = await this.getOrCreateBudget(userId, baseYear, baseMonth);
+      const budget = await this.getOrCreateBudget(userId, baseYear, baseMonth, workspaceId);
 
       if (row.installmentInfo) {
         const { current, total } = row.installmentInfo;
@@ -127,6 +156,7 @@ export class TransactionsService {
         const currentTx = await prisma.transaction.create({
           data: {
             userId,
+            workspaceId: workspaceId || null,
             monthlyBudgetId: budget.id,
             categoryId: matchedCategoryId,
             description: row.description,
@@ -162,11 +192,12 @@ export class TransactionsService {
           const targetDay = Math.min(baseDay, daysInFutureMonth);
           const futureDate = new Date(Date.UTC(futureYear, futureMonth - 1, targetDay));
 
-          const futureBudget = await this.getOrCreateBudget(userId, futureYear, futureMonth);
+          const futureBudget = await this.getOrCreateBudget(userId, futureYear, futureMonth, workspaceId);
 
           await prisma.transaction.create({
             data: {
               userId,
+              workspaceId: workspaceId || null,
               monthlyBudgetId: futureBudget.id,
               categoryId: matchedCategoryId,
               description: row.description,
@@ -186,6 +217,7 @@ export class TransactionsService {
         const tx = await prisma.transaction.create({
           data: {
             userId,
+            workspaceId: workspaceId || null,
             monthlyBudgetId: budget.id,
             categoryId: matchedCategoryId,
             description: row.description,
@@ -355,20 +387,28 @@ export class TransactionsService {
    */
   async listTransactions(
     userId: string,
-    options?: { year?: number; month?: number }
+    options?: { year?: number; month?: number; workspaceId?: string }
   ): Promise<TransactionResponseDTO[]> {
-    let whereClause: any = { userId };
+    let whereClause: any = options?.workspaceId ? { workspaceId: options.workspaceId } : { userId };
 
     if (options?.year && options?.month) {
-      const budget = await prisma.monthlyBudget.findUnique({
-        where: {
-          userId_month_year: {
-            userId,
-            month: options.month,
-            year: options.year,
-          },
-        },
-      });
+      const budget = options.workspaceId
+        ? await prisma.monthlyBudget.findFirst({
+            where: {
+              workspaceId: options.workspaceId,
+              month: options.month,
+              year: options.year,
+            },
+          })
+        : await prisma.monthlyBudget.findUnique({
+            where: {
+              userId_month_year: {
+                userId,
+                month: options.month,
+                year: options.year,
+              },
+            },
+          });
 
       if (budget) {
         whereClause.monthlyBudgetId = budget.id;

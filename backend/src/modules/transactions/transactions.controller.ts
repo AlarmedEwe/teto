@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { TransactionsService } from './transactions.service.js';
-import { getDefaultUser } from '../../shared/utils/get-default-user.js';
+import { getUserAndWorkspace } from '../../shared/utils/get-user-workspace.js';
 import { CreateTransactionDTO, UpdateTransactionCategoryDTO, UpdateTransactionDTO } from '@teto/types';
 
 interface TransactionParams {
@@ -20,9 +20,9 @@ export class TransactionsController {
   constructor(private transactionsService = new TransactionsService()) {}
 
   async create(request: FastifyRequest<{ Body: CreateTransactionDTO }>, reply: FastifyReply) {
-    const user = await getDefaultUser();
+    const { userId, workspaceId } = await getUserAndWorkspace(request);
     try {
-      const result = await this.transactionsService.createTransaction(user.id, request.body);
+      const result = await this.transactionsService.createTransaction(userId, request.body, workspaceId);
       return reply.status(201).send(result);
     } catch (err: any) {
       return reply.status(400).send({
@@ -34,11 +34,10 @@ export class TransactionsController {
   }
 
   async importCsv(request: FastifyRequest, reply: FastifyReply) {
-    const user = await getDefaultUser();
+    const { userId, workspaceId } = await getUserAndWorkspace(request);
     let csvContent = '';
 
     try {
-      // Verificar se é multipart/form-data
       if (request.isMultipart()) {
         const file = await request.file();
         if (!file) {
@@ -62,7 +61,7 @@ export class TransactionsController {
         });
       }
 
-      const result = await this.transactionsService.importCsv(user.id, csvContent);
+      const result = await this.transactionsService.importCsv(userId, csvContent, workspaceId);
       return reply.status(200).send(result);
     } catch (err: any) {
       return reply.status(400).send({
@@ -77,10 +76,10 @@ export class TransactionsController {
     request: FastifyRequest<{ Params: TransactionCategoryParams; Body: UpdateTransactionCategoryDTO }>,
     reply: FastifyReply
   ) {
-    const user = await getDefaultUser();
+    const { userId } = await getUserAndWorkspace(request);
     try {
       const result = await this.transactionsService.updateCategory(
-        user.id,
+        userId,
         request.params.id,
         request.body
       );
@@ -98,10 +97,10 @@ export class TransactionsController {
     request: FastifyRequest<{ Params: TransactionParams; Body: UpdateTransactionDTO }>,
     reply: FastifyReply
   ) {
-    const user = await getDefaultUser();
+    const { userId } = await getUserAndWorkspace(request);
     try {
       const result = await this.transactionsService.updateTransaction(
-        user.id,
+        userId,
         request.params.id,
         request.body
       );
@@ -119,9 +118,9 @@ export class TransactionsController {
     request: FastifyRequest<{ Params: TransactionParams }>,
     reply: FastifyReply
   ) {
-    const user = await getDefaultUser();
+    const { userId } = await getUserAndWorkspace(request);
     try {
-      await this.transactionsService.deleteTransaction(user.id, request.params.id);
+      await this.transactionsService.deleteTransaction(userId, request.params.id);
       return reply.status(204).send();
     } catch (err: any) {
       return reply.status(400).send({
@@ -136,11 +135,11 @@ export class TransactionsController {
     request: FastifyRequest<{ Querystring: ListTransactionsQuery }>,
     reply: FastifyReply
   ) {
-    const user = await getDefaultUser();
+    const { userId, workspaceId } = await getUserAndWorkspace(request);
     const year = request.query.year ? parseInt(request.query.year, 10) : undefined;
     const month = request.query.month ? parseInt(request.query.month, 10) : undefined;
 
-    const list = await this.transactionsService.listTransactions(user.id, { year, month });
+    const list = await this.transactionsService.listTransactions(userId, { year, month, workspaceId });
     return reply.status(200).send(list);
   }
 }

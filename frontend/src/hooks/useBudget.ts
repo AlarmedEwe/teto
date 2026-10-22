@@ -39,6 +39,12 @@ export function useBudget() {
 
   useEffect(() => {
     loadData();
+
+    const handleWorkspaceSwitched = () => {
+      loadData();
+    };
+    window.addEventListener('workspace-switched', handleWorkspaceSwitched);
+    return () => window.removeEventListener('workspace-switched', handleWorkspaceSwitched);
   }, [loadData]);
 
   const prevMonth = () => {

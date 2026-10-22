@@ -2,9 +2,9 @@ import { prisma } from '../../shared/database/prisma.js';
 import { CategoryListResponseDTO, UpdateCategoriesDTO } from '@teto/types';
 
 export class CategoriesService {
-  async listCategories(userId: string): Promise<CategoryListResponseDTO> {
+  async listCategories(userId: string, workspaceId?: string): Promise<CategoryListResponseDTO> {
     const categories = await prisma.category.findMany({
-      where: { userId },
+      where: workspaceId ? { workspaceId } : { userId },
       orderBy: { defaultPct: 'desc' },
     });
 
@@ -12,6 +12,7 @@ export class CategoriesService {
       categories: categories.map((c) => ({
         id: c.id,
         userId: c.userId,
+        workspaceId: c.workspaceId || '',
         name: c.name,
         defaultPct: c.defaultPct,
         colorHex: c.colorHex,
@@ -20,7 +21,7 @@ export class CategoriesService {
     };
   }
 
-  async updateCategories(userId: string, data: UpdateCategoriesDTO): Promise<CategoryListResponseDTO> {
+  async updateCategories(userId: string, data: UpdateCategoriesDTO, workspaceId?: string): Promise<CategoryListResponseDTO> {
     if (!data.categories || !Array.isArray(data.categories)) {
       throw new Error('Lista de categorias inválida');
     }
@@ -44,7 +45,7 @@ export class CategoriesService {
         prisma.category.updateMany({
           where: {
             id: cat.id,
-            userId,
+            ...(workspaceId ? { workspaceId } : { userId }),
           },
           data: {
             defaultPct: cat.defaultPct,
@@ -55,6 +56,6 @@ export class CategoriesService {
       )
     );
 
-    return this.listCategories(userId);
+    return this.listCategories(userId, workspaceId);
   }
 }

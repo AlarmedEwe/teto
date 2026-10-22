@@ -12,7 +12,12 @@ import {
 } from '@teto/types';
 
 export class BudgetService {
-  async getBudgetSummary(userId: string, year: number, month: number): Promise<BudgetSummaryResponseDTO> {
+  async getBudgetSummary(
+    userId: string,
+    year: number,
+    month: number,
+    workspaceId?: string
+  ): Promise<BudgetSummaryResponseDTO> {
     if (month < 1 || month > 12) {
       throw new Error('Mês deve estar entre 1 e 12');
     }
@@ -20,27 +25,32 @@ export class BudgetService {
       throw new Error('Ano inválido');
     }
 
-    // Obter ou criar registro de MonthlyBudget
-    const budget = await prisma.monthlyBudget.upsert({
-      where: {
-        userId_month_year: {
+    const ws = workspaceId
+      ? await prisma.workspace.findUnique({ where: { id: workspaceId } })
+      : null;
+
+    // Obter ou criar registro de MonthlyBudget para o espaço
+    let budget = workspaceId
+      ? await prisma.monthlyBudget.findFirst({
+          where: { workspaceId, month, year },
+        })
+      : null;
+
+    if (!budget) {
+      budget = await prisma.monthlyBudget.create({
+        data: {
           userId,
+          workspaceId: workspaceId || null,
           month,
           year,
+          totalIncome: 0,
         },
-      },
-      update: {},
-      create: {
-        userId,
-        month,
-        year,
-        totalIncome: 0,
-      },
-    });
+      });
+    }
 
-    // Obter categorias do usuário
+    // Obter categorias vinculadas ao espaço (ou fallback para usuário)
     const categories = await prisma.category.findMany({
-      where: { userId },
+      where: workspaceId ? { workspaceId } : { userId },
       orderBy: { defaultPct: 'desc' },
     });
 
@@ -101,12 +111,31 @@ export class BudgetService {
 
     const balance = calculateBalance(effectiveIncome, totalSpent);
 
+    // Se o espaço for cumulativo (ex: Reserva de Oportunidade), calcula saldo histórico total
+    let cumulativeBalance: number | undefined;
+    if (ws?.type === 'CUMULATIVE' && workspaceId) {
+      const allWsTxs = await prisma.transaction.findMany({
+        where: { workspaceId },
+        select: { type: true, amount: true },
+      });
+      let totalAportes = 0;
+      let totalResgates = 0;
+      for (const tx of allWsTxs) {
+        if (tx.type === 'INCOME') totalAportes += tx.amount;
+        else totalResgates += tx.amount;
+      }
+      cumulativeBalance = totalAportes - totalResgates;
+    }
+
     return {
       month: budget.month,
       year: budget.year,
+      workspaceType: ws?.type as any,
+      workspaceName: ws?.name,
       totalIncome: effectiveIncome,
       totalSpent,
       balance,
+      cumulativeBalance,
       categories: categorySummaries,
     };
   }
