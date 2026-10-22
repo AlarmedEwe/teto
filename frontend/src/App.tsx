@@ -10,7 +10,7 @@ import { TransactionModal } from './components/transactions/TransactionModal.js'
 import { TransactionList } from './components/transactions/TransactionList.js';
 import { CsvUploadModal } from './components/csv-uploader/CsvUploadModal.js';
 import { AuthProvider, useAuth } from './contexts/AuthContext.js';
-import { AuthModal } from './components/auth/AuthModal.js';
+import { AuthView } from './components/auth/AuthView.js';
 import { CreateWorkspaceModal } from './components/workspaces/CreateWorkspaceModal.js';
 import { InviteMemberModal } from './components/workspaces/InviteMemberModal.js';
 import { AcceptInviteView } from './components/workspaces/AcceptInviteView.js';
@@ -18,8 +18,12 @@ import { Plus, Sliders, Upload, RefreshCw, AlertCircle, Coins, Sparkles, Buildin
 import { TransactionResponseDTO, TransactionType, CreateTransactionDTO, WorkspaceType } from '@teto/types';
 import { formatCurrency } from './utils/formatters.js';
 
-function MainApp() {
-  const { user, activeWorkspace, setIsAuthModalOpen } = useAuth();
+interface MainAppProps {
+  initialInviteToken: string | null;
+}
+
+function MainApp({ initialInviteToken }: MainAppProps) {
+  const { activeWorkspace } = useAuth();
 
   const {
     year,
@@ -52,13 +56,7 @@ function MainApp() {
   const [inviteMemberModalOpen, setInviteMemberModalOpen] = useState(false);
 
   // Detecção de link de convite na URL (/invite/:token)
-  const [inviteToken, setInviteToken] = useState<string | null>(() => {
-    if (typeof window !== 'undefined') {
-      const match = window.location.pathname.match(/\/invite\/([a-zA-Z0-9_-]+)/);
-      return match ? match[1] : null;
-    }
-    return null;
-  });
+  const [inviteToken, setInviteToken] = useState<string | null>(initialInviteToken);
 
   const categories = budget?.categories || [];
   const totalIncome = budget?.totalIncome || 0;
@@ -373,8 +371,6 @@ function MainApp() {
       />
 
       {/* Modais Globais */}
-      <AuthModal />
-
       <CreateWorkspaceModal
         isOpen={createWorkspaceModalOpen}
         onClose={() => setCreateWorkspaceModalOpen(false)}
@@ -416,10 +412,57 @@ function MainApp() {
   );
 }
 
+function RootRouter() {
+  const { user, loading } = useAuth();
+
+  const [inviteToken, setInviteToken] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      const match = window.location.pathname.match(/\/invite\/([a-zA-Z0-9_-]+)/);
+      return match ? match[1] : null;
+    }
+    return null;
+  });
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center p-4">
+        <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-400 p-0.5 mb-4 shadow-xl shadow-amber-500/20 animate-pulse flex items-center justify-center">
+          <div className="w-full h-full bg-neutral-950 rounded-[14px] flex items-center justify-center">
+            <img src="/favicon.svg" alt="Teto" className="w-8 h-8" />
+          </div>
+        </div>
+        <div className="text-neutral-400 text-xs font-semibold tracking-wider uppercase animate-pulse">
+          Carregando Teto...
+        </div>
+      </div>
+    );
+  }
+
+  // Quando não estiver logado, não exibe absolutamente nada do sistema além da tela de autenticação
+  if (!user) {
+    if (inviteToken) {
+      return (
+        <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center p-4">
+          <AcceptInviteView
+            token={inviteToken}
+            onAccepted={() => {
+              setInviteToken(null);
+              window.location.href = '/';
+            }}
+          />
+        </div>
+      );
+    }
+    return <AuthView inviteToken={inviteToken} />;
+  }
+
+  return <MainApp initialInviteToken={inviteToken} />;
+}
+
 export default function App() {
   return (
     <AuthProvider>
-      <MainApp />
+      <RootRouter />
     </AuthProvider>
   );
 }

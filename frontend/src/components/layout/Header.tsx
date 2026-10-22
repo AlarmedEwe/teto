@@ -147,21 +147,14 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Botão de Autenticação / Perfil */}
-          {user ? (
+          {user && (
             <button
               onClick={logout}
               title={`Conectado como ${user.email} (Clique para sair)`}
-              className="hidden lg:flex p-2 rounded-xl text-neutral-400 hover:text-rose-400 hover:bg-neutral-850 transition border border-neutral-800 shrink-0"
+              className="flex items-center gap-1.5 p-2 rounded-xl text-neutral-400 hover:text-rose-400 hover:bg-neutral-850 transition border border-neutral-800 shrink-0"
             >
               <LogOut className="w-4 h-4" />
-            </button>
-          ) : (
-            <button
-              onClick={() => setIsAuthModalOpen(true)}
-              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-amber-500/40 text-xs font-semibold text-neutral-200 transition shrink-0"
-            >
-              <LogIn className="w-3.5 h-3.5 text-amber-500" />
-              <span>Login</span>
+              <span className="hidden sm:inline text-xs font-semibold">Sair</span>
             </button>
           )}
         </div>
